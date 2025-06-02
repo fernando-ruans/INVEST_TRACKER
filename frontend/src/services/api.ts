@@ -298,6 +298,35 @@ export const newsService = {
 };
 
 // Serviços de Calendário Econômico
+// Função para mapear dados do backend para o formato do frontend
+const mapEconomicEvent = (backendEvent: any): EconomicEvent => {
+  // Extrair data e hora do campo datetime se disponível
+  let date = backendEvent.date;
+  let time = backendEvent.time;
+  
+  if (backendEvent.datetime && !date) {
+    const datetime = new Date(backendEvent.datetime);
+    date = datetime.toISOString().split('T')[0]; // YYYY-MM-DD
+    time = datetime.toTimeString().slice(0, 5); // HH:MM
+  }
+  
+  return {
+    id: backendEvent.id?.toString() || Math.random().toString(),
+    title: backendEvent.title || backendEvent.event || 'Evento Econômico',
+    description: backendEvent.description || '',
+    date: date || new Date().toISOString().split('T')[0],
+    time: time,
+    country: backendEvent.country || 'US',
+    importance: (backendEvent.importance?.toLowerCase() || 'medium') as 'low' | 'medium' | 'high',
+    category: backendEvent.category || 'Economic',
+    actual: backendEvent.actual,
+    forecast: backendEvent.forecast,
+    previous: backendEvent.previous,
+    currency: backendEvent.currency,
+    impact: backendEvent.impact as 'positive' | 'negative' | 'neutral' | undefined
+  };
+};
+
 export const calendarService = {
   // Obter eventos econômicos
   async getEconomicEvents(filters: CalendarFilter = {}): Promise<EconomicEvent[]> {
@@ -309,10 +338,10 @@ export const calendarService = {
       }
     });
 
-    const response: AxiosResponse<ApiResponse<EconomicEvent[]>> = await api.get(
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(
       `/calendar/events?${params.toString()}`
     );
-    return response.data.data;
+    return response.data.data.map(mapEconomicEvent);
   },
 
   // Obter eventos de hoje
@@ -328,8 +357,8 @@ export const calendarService = {
       url += `?${params.toString()}`;
     }
 
-    const response: AxiosResponse<ApiResponse<EconomicEvent[]>> = await api.get(url);
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(url);
+    return response.data.data.map(mapEconomicEvent);
   },
 
   // Obter eventos da semana
@@ -345,29 +374,28 @@ export const calendarService = {
       url += `?${params.toString()}`;
     }
 
-    const response: AxiosResponse<ApiResponse<EconomicEvent[]>> = await api.get(url);
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(url);
+    return response.data.data.map(mapEconomicEvent);
   },
 
   // Obter próximos eventos
   async getUpcomingEvents(
     days: number = 7,
-    country?: string,
-    importance?: string,
-    limit: number = 20
+    filters: CalendarFilter = {}
   ): Promise<EconomicEvent[]> {
-    const params = new URLSearchParams({
-      days: days.toString(),
-      limit: limit.toString(),
-    });
+    const params = new URLSearchParams();
+    params.append('days', days.toString());
     
-    if (country) params.append('country', country);
-    if (importance) params.append('importance', importance);
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) {
+        params.append(key, value.toString());
+      }
+    });
 
-    const response: AxiosResponse<ApiResponse<EconomicEvent[]>> = await api.get(
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(
       `/calendar/upcoming?${params.toString()}`
     );
-    return response.data.data;
+    return response.data.data.map(mapEconomicEvent);
   },
 
   // Obter países disponíveis
@@ -408,16 +436,16 @@ export const calendarService = {
       url += `?${params.toString()}`;
     }
 
-    const response: AxiosResponse<ApiResponse<EconomicEvent[]>> = await api.get(url);
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(url);
+    return response.data.data.map(mapEconomicEvent);
   },
 
   // Buscar eventos
   async searchEvents(query: string, limit: number = 20): Promise<EconomicEvent[]> {
-    const response: AxiosResponse<ApiResponse<EconomicEvent[]>> = await api.get(
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(
       `/calendar/search?query=${encodeURIComponent(query)}&limit=${limit}`
     );
-    return response.data.data;
+    return response.data.data.map(mapEconomicEvent);
   },
 };
 
