@@ -87,8 +87,9 @@ class AssetService:
         Busca ativos por nome ou símbolo
         """
         try:
-            # Lista de símbolos populares para demonstração
+            # Lista expandida de símbolos populares incluindo ativos brasileiros
             popular_symbols = [
+                # Ações americanas populares
                 {"symbol": "AAPL", "name": "Apple Inc.", "exchange": "NASDAQ"},
                 {"symbol": "GOOGL", "name": "Alphabet Inc.", "exchange": "NASDAQ"},
                 {"symbol": "MSFT", "name": "Microsoft Corporation", "exchange": "NASDAQ"},
@@ -108,7 +109,138 @@ class AssetService:
                 {"symbol": "MA", "name": "Mastercard Incorporated", "exchange": "NYSE"},
                 {"symbol": "BAC", "name": "Bank of America Corporation", "exchange": "NYSE"},
                 {"symbol": "XOM", "name": "Exxon Mobil Corporation", "exchange": "NYSE"},
-                {"symbol": "DIS", "name": "Walt Disney Company", "exchange": "NYSE"}
+                {"symbol": "DIS", "name": "Walt Disney Company", "exchange": "NYSE"},
+                
+                # Ações brasileiras - Bancos
+                {"symbol": "ITUB4.SA", "name": "Itaú Unibanco Holding S.A.", "exchange": "B3"},
+                {"symbol": "BBDC4.SA", "name": "Banco Bradesco S.A.", "exchange": "B3"},
+                {"symbol": "BBAS3.SA", "name": "Banco do Brasil S.A.", "exchange": "B3"},
+                {"symbol": "SANB11.SA", "name": "Banco Santander Brasil S.A.", "exchange": "B3"},
+                {"symbol": "BPAC11.SA", "name": "BTG Pactual S.A.", "exchange": "B3"},
+                
+                # Ações brasileiras - Petróleo e Energia
+                {"symbol": "PETR4.SA", "name": "Petróleo Brasileiro S.A. - Petrobras", "exchange": "B3"},
+                {"symbol": "PETR3.SA", "name": "Petróleo Brasileiro S.A. - Petrobras ON", "exchange": "B3"},
+                {"symbol": "VALE3.SA", "name": "Vale S.A.", "exchange": "B3"},
+                {"symbol": "ELET3.SA", "name": "Centrais Elétricas Brasileiras S.A. - Eletrobras", "exchange": "B3"},
+                {"symbol": "ELET6.SA", "name": "Centrais Elétricas Brasileiras S.A. - Eletrobras PNB", "exchange": "B3"},
+                
+                # Ações brasileiras - Varejo e Consumo
+                {"symbol": "MGLU3.SA", "name": "Magazine Luiza S.A.", "exchange": "B3"},
+                {"symbol": "LREN3.SA", "name": "Lojas Renner S.A.", "exchange": "B3"},
+                {"symbol": "ABEV3.SA", "name": "Ambev S.A.", "exchange": "B3"},
+                {"symbol": "JBSS3.SA", "name": "JBS S.A.", "exchange": "B3"},
+                {"symbol": "BRFS3.SA", "name": "BRF S.A.", "exchange": "B3"},
+                
+                # Ações brasileiras - Tecnologia e Telecom
+                {"symbol": "VIVT3.SA", "name": "Telefônica Brasil S.A.", "exchange": "B3"},
+                {"symbol": "TIMS3.SA", "name": "TIM S.A.", "exchange": "B3"},
+                {"symbol": "WEGE3.SA", "name": "WEG S.A.", "exchange": "B3"},
+                {"symbol": "TOTS3.SA", "name": "TOTVS S.A.", "exchange": "B3"},
+                
+                # Ações brasileiras - Siderurgia e Mineração
+                {"symbol": "USIM5.SA", "name": "Usinas Siderúrgicas de Minas Gerais S.A.", "exchange": "B3"},
+                {"symbol": "CSNA3.SA", "name": "Companhia Siderúrgica Nacional", "exchange": "B3"},
+                {"symbol": "GOAU4.SA", "name": "Metalúrgica Gerdau S.A.", "exchange": "B3"},
+                
+                # ETFs brasileiros
+                {"symbol": "BOVA11.SA", "name": "iShares Ibovespa Fundo de Índice", "exchange": "B3"},
+                {"symbol": "SMAL11.SA", "name": "iShares BM&F Bovespa Small Cap Fundo de Índice", "exchange": "B3"},
+                {"symbol": "IVVB11.SA", "name": "iShares Core S&P 500 Fundo de Índice", "exchange": "B3"},
+                {"symbol": "SPXI11.SA", "name": "SPDR S&P 500 ETF Trust", "exchange": "B3"},
+                
+                # FIIs populares
+                 {"symbol": "HGLG11.SA", "name": "CSHG Logística FII", "exchange": "B3"},
+                 {"symbol": "XPML11.SA", "name": "XP Malls FII", "exchange": "B3"},
+                 {"symbol": "KNRI11.SA", "name": "Kinea Renda Imobiliária FII", "exchange": "B3"},
+                 {"symbol": "BCFF11.SA", "name": "BTG Pactual Fundo de FIIs", "exchange": "B3"},
+                 {"symbol": "MXRF11.SA", "name": "Maxi Renda FII", "exchange": "B3"},
+                 {"symbol": "VISC11.SA", "name": "Vinci Shopping Centers FII", "exchange": "B3"},
+                 {"symbol": "XPLG11.SA", "name": "XP Log FII", "exchange": "B3"},
+                 {"symbol": "HGRE11.SA", "name": "CSHG Real Estate FII", "exchange": "B3"},
+                 {"symbol": "KNCR11.SA", "name": "Kinea Rendimentos Imobiliários FII", "exchange": "B3"},
+                 {"symbol": "BTLG11.SA", "name": "BTG Pactual Logística FII", "exchange": "B3"},
+                 
+                 # Criptomoedas principais
+                 {"symbol": "BTC-USD", "name": "Bitcoin", "exchange": "Crypto"},
+                 {"symbol": "ETH-USD", "name": "Ethereum", "exchange": "Crypto"},
+                 {"symbol": "BNB-USD", "name": "Binance Coin", "exchange": "Crypto"},
+                 {"symbol": "ADA-USD", "name": "Cardano", "exchange": "Crypto"},
+                 {"symbol": "SOL-USD", "name": "Solana", "exchange": "Crypto"},
+                 {"symbol": "XRP-USD", "name": "Ripple", "exchange": "Crypto"},
+                 {"symbol": "DOT-USD", "name": "Polkadot", "exchange": "Crypto"},
+                 {"symbol": "DOGE-USD", "name": "Dogecoin", "exchange": "Crypto"},
+                 {"symbol": "AVAX-USD", "name": "Avalanche", "exchange": "Crypto"},
+                 {"symbol": "MATIC-USD", "name": "Polygon", "exchange": "Crypto"},
+                 
+                 # Commodities
+                 # Metais Preciosos
+                 {"symbol": "GC=F", "name": "Ouro (Gold Futures)", "exchange": "COMEX"},
+                 {"symbol": "SI=F", "name": "Prata (Silver Futures)", "exchange": "COMEX"},
+                 {"symbol": "PL=F", "name": "Platina (Platinum Futures)", "exchange": "NYMEX"},
+                 {"symbol": "PA=F", "name": "Paládio (Palladium Futures)", "exchange": "NYMEX"},
+                 
+                 # Energia
+                 {"symbol": "CL=F", "name": "Petróleo Bruto WTI", "exchange": "NYMEX"},
+                 {"symbol": "BZ=F", "name": "Petróleo Brent", "exchange": "ICE"},
+                 {"symbol": "NG=F", "name": "Gás Natural", "exchange": "NYMEX"},
+                 
+                 # Metais Industriais
+                 {"symbol": "HG=F", "name": "Cobre", "exchange": "COMEX"},
+                 
+                 # Agricultura
+                 {"symbol": "ZC=F", "name": "Milho", "exchange": "CBOT"},
+                 {"symbol": "ZS=F", "name": "Soja", "exchange": "CBOT"},
+                 {"symbol": "ZW=F", "name": "Trigo", "exchange": "CBOT"},
+                 {"symbol": "KC=F", "name": "Café", "exchange": "ICE"},
+                 {"symbol": "SB=F", "name": "Açúcar", "exchange": "ICE"},
+                 {"symbol": "CC=F", "name": "Cacau", "exchange": "ICE"},
+                 {"symbol": "CT=F", "name": "Algodão", "exchange": "ICE"},
+                 {"symbol": "OJ=F", "name": "Suco de Laranja", "exchange": "ICE"},
+                 
+                 # Outros
+                 {"symbol": "LBS=F", "name": "Madeira (Lumber)", "exchange": "CME"},
+                 
+                 # Moedas (Forex)
+                 {"symbol": "EURUSD=X", "name": "Euro/Dólar Americano", "exchange": "Forex"},
+                 {"symbol": "GBPUSD=X", "name": "Libra/Dólar Americano", "exchange": "Forex"},
+                 {"symbol": "USDJPY=X", "name": "Dólar Americano/Iene Japonês", "exchange": "Forex"},
+                 {"symbol": "USDCAD=X", "name": "Dólar Americano/Dólar Canadense", "exchange": "Forex"},
+                 {"symbol": "AUDUSD=X", "name": "Dólar Australiano/Dólar Americano", "exchange": "Forex"},
+                 {"symbol": "USDBRL=X", "name": "Dólar Americano/Real Brasileiro", "exchange": "Forex"},
+                 {"symbol": "EURBRL=X", "name": "Euro/Real Brasileiro", "exchange": "Forex"},
+                 
+                 # Índices Internacionais
+                 {"symbol": "^GSPC", "name": "S&P 500", "exchange": "NYSE"},
+                 {"symbol": "^DJI", "name": "Dow Jones Industrial Average", "exchange": "NYSE"},
+                 {"symbol": "^IXIC", "name": "NASDAQ Composite", "exchange": "NASDAQ"},
+                 {"symbol": "^FTSE", "name": "FTSE 100", "exchange": "LSE"},
+                 {"symbol": "^GDAXI", "name": "DAX", "exchange": "XETRA"},
+                 {"symbol": "^N225", "name": "Nikkei 225", "exchange": "TSE"},
+                 {"symbol": "^HSI", "name": "Hang Seng Index", "exchange": "HKEX"},
+                 
+                 # Títulos e Bonds
+                 {"symbol": "^TNX", "name": "Treasury Yield 10 Years", "exchange": "CBOE"},
+                 {"symbol": "^FVX", "name": "Treasury Yield 5 Years", "exchange": "CBOE"},
+                 {"symbol": "^IRX", "name": "Treasury Bill 3 Month", "exchange": "CBOE"},
+                 
+                 # Forex Adicional
+                 {"symbol": "USDCHF=X", "name": "Dólar Americano/Franco Suíço", "exchange": "Forex"},
+                 {"symbol": "USDJPY=X", "name": "Dólar Americano/Iene Japonês", "exchange": "Forex"},
+                 {"symbol": "NZDUSD=X", "name": "Dólar Neozelandês/Dólar Americano", "exchange": "Forex"},
+                 {"symbol": "EURJPY=X", "name": "Euro/Iene Japonês", "exchange": "Forex"},
+                 {"symbol": "GBPJPY=X", "name": "Libra/Iene Japonês", "exchange": "Forex"},
+                 {"symbol": "EURGBP=X", "name": "Euro/Libra", "exchange": "Forex"},
+                 
+                 # Futuros BMF (B3)
+                 {"symbol": "WDO=F", "name": "Mini Dólar Futuro", "exchange": "BMF"},
+                 {"symbol": "DOL=F", "name": "Dólar Futuro", "exchange": "BMF"},
+                 {"symbol": "WIN=F", "name": "Mini Índice Futuro", "exchange": "BMF"},
+                 {"symbol": "IND=F", "name": "Índice Futuro", "exchange": "BMF"},
+                 {"symbol": "BGI=F", "name": "Boi Gordo Futuro", "exchange": "BMF"},
+                 {"symbol": "CCM=F", "name": "Milho Futuro", "exchange": "BMF"},
+                 {"symbol": "ICF=F", "name": "Café Arábica Futuro", "exchange": "BMF"},
+                 {"symbol": "DI1=F", "name": "DI Futuro", "exchange": "BMF"}
             ]
             
             # Filtrar por query
@@ -138,8 +270,8 @@ class AssetService:
             indices = {
                 "^BVSP": "Ibovespa",
                 "IFIX.SA": "IFIX",
-                "SMLL11.SA": "Small Cap",
-                "IDIV11.SA": "Dividendos"
+                "SMAL11.SA": "Small Cap",
+                "DIVO11.SA": "Dividendos"
             }
             
             indices_data = []

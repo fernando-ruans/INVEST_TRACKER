@@ -29,16 +29,34 @@ const Dashboard: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       setError(null);
-      await Promise.all([
+      
+      // Usar Promise.allSettled para carregamento paralelo com melhor controle de erros
+      const results = await Promise.allSettled([
         loadMarketOverview(),
         loadPortfolios(),
         loadNews(),
         loadTodayEvents(),
       ]);
+      
+      // Verificar se pelo menos uma API funcionou
+      const successfulResults = results.filter(result => result.status === 'fulfilled');
+      
+      if (successfulResults.length === 0) {
+        throw new Error('Todas as APIs falharam');
+      }
+      
+      // Log dos erros para debug
+      results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+          const apiNames = ['Market Overview', 'Portfolios', 'News', 'Events'];
+          console.warn(`${apiNames[index]} falhou:`, result.reason);
+        }
+      });
+      
       setLastUpdate(new Date());
     } catch (error) {
       console.error('Erro ao carregar dados do dashboard:', error);
-      setError('Erro ao carregar dados. Tente novamente.');
+      setError('Erro ao carregar dados. Algumas informações podem estar indisponíveis.');
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +106,7 @@ const Dashboard: React.FC = () => {
         currencies: [],
         commodities: []
       });
+      throw error; // Re-throw para que Promise.allSettled capture
     }
   };
 
@@ -96,13 +115,18 @@ const Dashboard: React.FC = () => {
       const portfolioList = await portfolioService.getPortfolios();
       setPortfolios(portfolioList);
       
-      // Calcular estatísticas do dashboard
+      // Calcular estatísticas do dashboard de forma assíncrona
       if (portfolioList.length > 0) {
-        const stats = await calculateDashboardStats(portfolioList);
-        setDashboardStats(stats);
+        // Não bloquear o carregamento principal para calcular stats
+        calculateDashboardStats(portfolioList).then(stats => {
+          setDashboardStats(stats);
+        }).catch(error => {
+          console.error('Erro ao calcular estatísticas:', error);
+        });
       }
     } catch (error) {
       console.error('Erro ao carregar portfolios:', error);
+      throw error; // Re-throw para que Promise.allSettled capture
     }
   };
 
@@ -112,6 +136,19 @@ const Dashboard: React.FC = () => {
       setNews(headlines);
     } catch (error) {
       console.error('Erro ao carregar notícias:', error);
+      // Fallback com notícias padrão
+      setNews([
+        {
+          id: '1',
+          title: 'Mercado em análise',
+          description: 'Acompanhe as principais movimentações do mercado.',
+          url: '#',
+          publishedDate: new Date().toISOString(),
+          source: 'Sistema',
+          category: 'economy'
+        }
+      ]);
+      throw error; // Re-throw para que Promise.allSettled capture
     }
   };
 
@@ -121,6 +158,8 @@ const Dashboard: React.FC = () => {
       setTodayEvents(events.slice(0, 5)); // Mostrar apenas os 5 primeiros
     } catch (error) {
       console.error('Erro ao carregar eventos de hoje:', error);
+      setTodayEvents([]); // Fallback vazio
+      throw error; // Re-throw para que Promise.allSettled capture
     }
   };
 

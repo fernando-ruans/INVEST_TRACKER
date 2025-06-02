@@ -5,30 +5,25 @@ from datetime import datetime, timedelta
 import re
 from html import unescape
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class NewsService:
     # Cache simples para evitar muitas requisições
     _cache = {}
     _cache_duration = 300  # 5 minutos
     
-    # URLs dos feeds RSS
+    # URLs dos feeds RSS - reduzido para fontes mais confiáveis
     RSS_FEEDS = {
-        # Fontes Internacionais
-        "yahoo_finance": "https://feeds.finance.yahoo.com/rss/2.0/headline",
-        "investing_com": "https://www.investing.com/rss/news.rss",
-        "marketwatch": "https://feeds.marketwatch.com/marketwatch/topstories/",
-        "reuters_business": "https://feeds.reuters.com/reuters/businessNews",
-        "cnbc": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
-        
-        # Fontes Brasileiras
+        # Fontes Brasileiras mais confiáveis
         "infomoney": "https://www.infomoney.com.br/feed/",
         "valor_economico": "https://valor.globo.com/rss/home/",
         "exame": "https://exame.com/feed/",
-        "estadao_economia": "https://economia.estadao.com.br/rss.xml",
-        "folha_mercado": "https://feeds.folha.uol.com.br/mercado/rss091.xml",
         "g1_economia": "http://g1.globo.com/dynamo/economia/rss2.xml",
-        "uol_economia": "https://economia.uol.com.br/index.xml",
-        "money_times": "https://www.moneytimes.com.br/feed/"
+        "money_times": "https://www.moneytimes.com.br/feed/",
+        
+        # Fontes Internacionais confiáveis
+        "yahoo_finance": "https://feeds.finance.yahoo.com/rss/2.0/headline",
+        "reuters_business": "https://feeds.reuters.com/reuters/businessNews",
     }
     
     @staticmethod
@@ -48,6 +43,8 @@ class NewsService:
         
         # Remove quebras de linha excessivas
         text = re.sub(r'\n+', ' ', text)
+        
+        # Remove espaços excessivos
         text = re.sub(r'\s+', ' ', text)
         
         return text.strip()
@@ -59,69 +56,17 @@ class NewsService:
         """
         content = f"{title} {description}".lower()
         
-        # Palavras-chave para cada categoria com pesos (português e inglês)
-        categories = {
-            "stocks": {
-                "keywords": [
-                    # Inglês
-                    "stock", "shares", "equity", "ipo", "earnings", "dividend", "market cap", "nasdaq", "nyse", "s&p", "dow jones", "wall street", "trading", "investor", "shareholder", "quarterly", "revenue", "profit", "loss", "analyst", "upgrade", "downgrade",
-                    # Português
-                    "ação", "ações", "bolsa", "bovespa", "b3", "ibovespa", "dividendo", "dividendos", "lucro", "prejuízo", "receita", "faturamento", "balanço", "resultado", "trimestre", "acionista", "investidor", "negociação", "pregão", "cotação", "valorização", "desvalorização", "blue chip", "small caps"
-                ],
-                "weight": 1
-            },
-            "crypto": {
-                "keywords": [
-                    # Inglês
-                    "bitcoin", "ethereum", "crypto", "cryptocurrency", "blockchain", "defi", "nft", "binance", "coinbase", "altcoin", "mining", "btc", "eth", "digital currency", "token", "wallet", "exchange",
-                    # Português
-                    "criptomoeda", "criptomoedas", "moeda digital", "carteira digital", "mineração", "exchange", "corretora digital", "mercado bitcoin", "foxbit", "novadax"
-                ],
-                "weight": 2
-            },
-            "forex": {
-                "keywords": [
-                    # Inglês
-                    "forex", "currency", "dollar", "euro", "yen", "pound", "exchange rate", "fed", "federal reserve", "central bank", "interest rate", "monetary policy", "inflation", "usd", "eur", "gbp", "jpy",
-                    # Português
-                    "dólar", "real", "euro", "câmbio", "taxa de câmbio", "banco central", "copom", "selic", "política monetária", "inflação", "ipca", "igp-m", "ptax", "moeda", "valorização do real", "desvalorização do real"
-                ],
-                "weight": 2
-            },
-            "commodities": {
-                "keywords": [
-                    # Inglês
-                    "gold", "silver", "oil", "crude", "copper", "wheat", "corn", "natural gas", "commodity", "futures", "brent", "wti", "precious metals", "agriculture", "energy",
-                    # Português
-                    "ouro", "prata", "petróleo", "cobre", "minério de ferro", "soja", "milho", "café", "açúcar", "boi gordo", "commodities", "agronegócio", "vale", "petrobras", "pré-sal", "etanol"
-                ],
-                "weight": 2
-            },
-            "economy": {
-                "keywords": [
-                    # Inglês
-                    "gdp", "unemployment", "inflation", "recession", "economic growth", "trade war", "tariff", "export", "import", "manufacturing", "factory", "industrial", "economic data", "consumer", "retail",
-                    # Português
-                    "pib", "crescimento econômico", "recessão", "desemprego", "emprego", "caged", "pnad", "ibc-br", "atividade econômica", "indústria", "serviços", "varejo", "pmc", "pim", "exportação", "importação", "balança comercial", "déficit", "superávit", "governo", "orçamento", "fiscal"
-                ],
-                "weight": 1
-            }
-        }
-        
-        # Contar matches para cada categoria com pesos
-        category_scores = {}
-        for category, data in categories.items():
-            keywords = data["keywords"]
-            weight = data["weight"]
-            score = sum(weight for keyword in keywords if keyword in content)
-            if score > 0:
-                category_scores[category] = score
-        
-        # Retornar a categoria com maior score, ou 'financial' como padrão
-        if category_scores:
-            return max(category_scores, key=category_scores.get)
-        
-        return "financial"
+        # Palavras-chave simplificadas para categorização mais rápida
+        if any(keyword in content for keyword in ["ação", "ações", "bolsa", "bovespa", "ibovespa", "stock", "shares"]):
+            return "stocks"
+        elif any(keyword in content for keyword in ["bitcoin", "crypto", "criptomoeda", "ethereum"]):
+            return "crypto"
+        elif any(keyword in content for keyword in ["dólar", "câmbio", "forex", "currency"]):
+            return "forex"
+        elif any(keyword in content for keyword in ["petróleo", "ouro", "commodity", "soja", "minério"]):
+            return "commodities"
+        else:
+            return "economy"
     
     @staticmethod
     def _is_cache_valid(cache_key: str) -> bool:
@@ -154,23 +99,17 @@ class NewsService:
         }
     
     @staticmethod
-    def _parse_feed(feed_url: str, source: str, limit: int = 20) -> List[Dict[str, Any]]:
+    def _parse_feed_fast(feed_url: str, source: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
-        Faz parse de um feed RSS
+        Faz parse de um feed RSS com timeout reduzido
         """
         try:
-            # Verificar cache primeiro
-            cache_key = f"{source}_{limit}"
-            cached_data = NewsService._get_from_cache(cache_key)
-            if cached_data:
-                return cached_data
-            
-            # Buscar feed
+            # Buscar feed com timeout reduzido
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
             
-            response = requests.get(feed_url, headers=headers, timeout=10)
+            response = requests.get(feed_url, headers=headers, timeout=3)  # Timeout reduzido para 3s
             response.raise_for_status()
             
             feed = feedparser.parse(response.content)
@@ -181,9 +120,10 @@ class NewsService:
                 # Extrair data
                 published_date = datetime.now()
                 if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                    published_date = datetime(*entry.published_parsed[:6])
-                elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
-                    published_date = datetime(*entry.updated_parsed[:6])
+                    try:
+                        published_date = datetime(*entry.published_parsed[:6])
+                    except:
+                        pass
                 
                 # Extrair descrição
                 description = ""
@@ -193,8 +133,8 @@ class NewsService:
                     description = NewsService._clean_html(entry.description)
                 
                 # Limitar tamanho da descrição
-                if len(description) > 300:
-                    description = description[:297] + "..."
+                if len(description) > 200:
+                    description = description[:197] + "..."
                 
                 # Categorizar baseado no conteúdo
                 category = NewsService._categorize_news(entry.title, description)
@@ -210,9 +150,6 @@ class NewsService:
                 
                 news_items.append(news_item)
             
-            # Armazenar no cache
-            NewsService._set_cache(cache_key, news_items)
-            
             return news_items
             
         except Exception as e:
@@ -222,19 +159,57 @@ class NewsService:
     @staticmethod
     def get_financial_news(limit: int = 50) -> List[Dict[str, Any]]:
         """
-        Obtém notícias financeiras gerais de múltiplas fontes
+        Obtém notícias financeiras gerais de múltiplas fontes com processamento paralelo
         """
         try:
+            # Verificar cache primeiro
+            cache_key = f"financial_news_{limit}"
+            cached_data = NewsService._get_from_cache(cache_key)
+            if cached_data:
+                return cached_data
+            
             all_news = []
             
-            # Buscar de múltiplas fontes
-            for source, feed_url in NewsService.RSS_FEEDS.items():
-                try:
-                    source_news = NewsService._parse_feed(feed_url, source, limit // len(NewsService.RSS_FEEDS) + 5)
-                    all_news.extend(source_news)
-                except Exception as e:
-                    print(f"Erro ao buscar notícias de {source}: {str(e)}")
-                    continue
+            # Usar ThreadPoolExecutor para buscar feeds em paralelo
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                # Submeter todas as tarefas
+                future_to_source = {
+                    executor.submit(NewsService._parse_feed_fast, feed_url, source, 8): source 
+                    for source, feed_url in NewsService.RSS_FEEDS.items()
+                }
+                
+                # Coletar resultados com timeout
+                for future in as_completed(future_to_source, timeout=8):  # Timeout total de 8s
+                    try:
+                        source_news = future.result(timeout=1)  # Timeout individual de 1s
+                        all_news.extend(source_news)
+                    except Exception as e:
+                        source = future_to_source[future]
+                        print(f"Erro ao processar {source}: {str(e)}")
+                        continue
+            
+            # Se não conseguiu nenhuma notícia, retornar dados de fallback
+            if not all_news:
+                fallback_news = [
+                    {
+                        "title": "Mercado Financeiro em Análise",
+                        "description": "Acompanhe as principais movimentações do mercado financeiro brasileiro e internacional.",
+                        "url": "#",
+                        "published_at": datetime.now().isoformat(),
+                        "source": "sistema",
+                        "category": "economy"
+                    },
+                    {
+                        "title": "Índices em Movimento",
+                        "description": "Bovespa e principais índices internacionais apresentam volatilidade.",
+                        "url": "#",
+                        "published_at": datetime.now().isoformat(),
+                        "source": "sistema",
+                        "category": "stocks"
+                    }
+                ]
+                NewsService._set_cache(cache_key, fallback_news)
+                return fallback_news
             
             # Ordenar por data (mais recentes primeiro)
             all_news.sort(key=lambda x: x['published_at'], reverse=True)
@@ -245,18 +220,31 @@ class NewsService:
             
             for news in all_news:
                 title_lower = news['title'].lower()
-                if title_lower not in seen_titles:
+                if title_lower not in seen_titles and len(title_lower) > 10:  # Filtrar títulos muito curtos
                     seen_titles.add(title_lower)
                     unique_news.append(news)
                     
                 if len(unique_news) >= limit:
                     break
             
-            return unique_news[:limit]
+            result = unique_news[:limit]
+            NewsService._set_cache(cache_key, result)
+            return result
             
         except Exception as e:
-            raise Exception(f"Erro ao buscar notícias financeiras: {str(e)}")
-    
+            print(f"Erro geral ao buscar notícias: {str(e)}")
+            # Retornar dados de fallback em caso de erro
+            return [
+                {
+                    "title": "Sistema de Notícias Temporariamente Indisponível",
+                    "description": "As notícias estão sendo atualizadas. Tente novamente em alguns minutos.",
+                    "url": "#",
+                    "published_at": datetime.now().isoformat(),
+                    "source": "sistema",
+                    "category": "economy"
+                }
+            ]
+
     @staticmethod
     def get_asset_news(symbol: str, limit: int = 30) -> List[Dict[str, Any]]:
         """

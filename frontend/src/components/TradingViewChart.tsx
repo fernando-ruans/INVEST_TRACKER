@@ -204,17 +204,100 @@ export const SimpleTradingViewChart: React.FC<{
   const formatSymbolForTradingView = (inputSymbol: string): string => {
     const cleanSymbol = inputSymbol.trim().toUpperCase();
     
-    // Mapeamento de símbolos brasileiros
+    // Mapeamento de símbolos para TradingView
     const symbolMap: { [key: string]: string } = {
+      // Índices Brasileiros
       'IBOVESPA': 'BMFBOVESPA:IBOV',
       'IFIX': 'BMFBOVESPA:IFIX',
       'SMLL': 'BMFBOVESPA:SMLL',
       'IDIV': 'BMFBOVESPA:IDIV',
+      
+      // Ações Brasileiras
       'BOVA11': 'BMFBOVESPA:BOVA11',
       'PETR4': 'BMFBOVESPA:PETR4',
       'VALE3': 'BMFBOVESPA:VALE3',
       'ITUB4': 'BMFBOVESPA:ITUB4',
-      'BBDC4': 'BMFBOVESPA:BBDC4'
+      'BBDC4': 'BMFBOVESPA:BBDC4',
+      
+      // Commodities - Metais Preciosos
+      'GC=F': 'COMEX:GC1!',
+      'SI=F': 'COMEX:SI1!',
+      'PL=F': 'NYMEX:PL1!',
+      'PA=F': 'NYMEX:PA1!',
+      
+      // Commodities - Energia
+      'CL=F': 'NYMEX:CL1!',
+      'BZ=F': 'ICE:BRN1!',
+      'NG=F': 'NYMEX:NG1!',
+      
+      // Commodities - Metais Industriais
+      'HG=F': 'COMEX:HG1!',
+      
+      // Commodities - Agricultura
+      'ZC=F': 'CBOT:ZC1!',
+      'ZS=F': 'CBOT:ZS1!',
+      'ZW=F': 'CBOT:ZW1!',
+      'KC=F': 'ICEUS:KC1!',
+      'SB=F': 'ICEUS:SB1!',
+      'CC=F': 'ICEUS:CC1!',
+      'CT=F': 'ICEUS:CT1!',
+      'OJ=F': 'ICEUS:OJ1!',
+      
+      // Commodities - Outros
+      'LBS=F': 'CME:LBS1!',
+      
+      // Criptomoedas
+      'BTC-USD': 'BINANCE:BTCUSDT',
+      'ETH-USD': 'BINANCE:ETHUSDT',
+      'BNB-USD': 'BINANCE:BNBUSDT',
+      'ADA-USD': 'BINANCE:ADAUSDT',
+      'SOL-USD': 'BINANCE:SOLUSDT',
+      'XRP-USD': 'BINANCE:XRPUSDT',
+      'DOT-USD': 'BINANCE:DOTUSDT',
+      'DOGE-USD': 'BINANCE:DOGEUSDT',
+      'AVAX-USD': 'BINANCE:AVAXUSDT',
+      'MATIC-USD': 'BINANCE:MATICUSDT',
+      
+      // Forex
+      'EURUSD=X': 'FX:EURUSD',
+      'GBPUSD=X': 'FX:GBPUSD',
+      'USDJPY=X': 'FX:USDJPY',
+      'USDCAD=X': 'FX:USDCAD',
+      'AUDUSD=X': 'FX:AUDUSD',
+      'USDBRL=X': 'FX:USDBRL',
+      'EURBRL=X': 'FX:EURBRL',
+      
+      // Índices Internacionais
+      '^GSPC': 'SP:SPX',
+      '^DJI': 'DJ:DJI',
+      '^IXIC': 'NASDAQ:IXIC',
+      '^FTSE': 'FTSE:UKX',
+      '^GDAXI': 'XETR:DAX',
+      '^N225': 'TVC:NI225',
+      '^HSI': 'HSI:HSI',
+      
+      // Títulos e Bonds
+      '^TNX': 'TVC:TNX',
+      '^FVX': 'TVC:FVX',
+      '^IRX': 'TVC:IRX',
+      '^TYX': 'TVC:TYX',
+      
+      // Forex Adicional
+      'USDCHF=X': 'FX:USDCHF',
+      'NZDUSD=X': 'FX:NZDUSD',
+      'EURJPY=X': 'FX:EURJPY',
+      'GBPJPY=X': 'FX:GBPJPY',
+      'EURGBP=X': 'FX:EURGBP',
+      
+      // Futuros BMF (B3)
+      'WDO=F': 'BMFBOVESPA:WDO1!',
+      'DOL=F': 'BMFBOVESPA:DOL1!',
+      'WIN=F': 'BMFBOVESPA:WIN1!',
+      'IND=F': 'BMFBOVESPA:IND1!',
+      'BGI=F': 'BMFBOVESPA:BGI1!',
+      'CCM=F': 'BMFBOVESPA:CCM1!',
+      'ICF=F': 'BMFBOVESPA:ICF1!',
+      'DI1=F': 'BMFBOVESPA:DI11!'
     };
     
     // Se o símbolo já tem prefixo, usar como está
