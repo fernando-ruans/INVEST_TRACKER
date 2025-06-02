@@ -280,15 +280,29 @@ class AssetService:
     @staticmethod
     def get_market_overview() -> Dict[str, Any]:
         """
-        Obtém visão geral do mercado com principais índices brasileiros
+        Obtém visão geral do mercado com principais índices mundiais
         """
         try:
-            # Índices brasileiros principais
+            # Principais índices mundiais
             indices = {
+                # Brasil
                 "^BVSP": "Ibovespa",
                 "IFIX.SA": "IFIX",
                 "SMAL11.SA": "Small Cap",
-                "DIVO11.SA": "Dividendos"
+                "DIVO11.SA": "Dividendos",
+                # Estados Unidos
+                "^GSPC": "S&P 500",
+                "^IXIC": "Nasdaq",
+                "^DJI": "Dow Jones",
+                # Europa
+                "^GDAXI": "DAX 40",
+                "^FTSE": "FTSE 100",
+                "^FCHI": "CAC 40",
+                # Ásia
+                "^N225": "Nikkei 225",
+                "^HSI": "Hang Seng",
+                "000001.SS": "Shanghai",
+                "^KS11": "KOSPI"
             }
             
             indices_data = []
@@ -306,7 +320,7 @@ class AssetService:
                         change_percent = (change / previous_close) * 100 if previous_close != 0 else 0
                         
                         # Converter símbolo para formato usado no frontend
-                        display_symbol = symbol.replace(".SA", "").replace("^BVSP", "IBOVESPA")
+                        display_symbol = AssetService._convert_symbol_for_frontend(symbol)
                         
                         indices_data.append({
                             "symbol": display_symbol,
@@ -317,7 +331,7 @@ class AssetService:
                         })
                     else:
                         # Fallback com dados zerados se não conseguir buscar
-                        display_symbol = symbol.replace(".SA", "").replace("^BVSP", "IBOVESPA")
+                        display_symbol = AssetService._convert_symbol_for_frontend(symbol)
                         indices_data.append({
                             "symbol": display_symbol,
                             "name": name,
@@ -327,7 +341,7 @@ class AssetService:
                         })
                 except Exception as e:
                     # Se falhar para um índice específico, adiciona com dados zerados
-                    display_symbol = symbol.replace(".SA", "").replace("^BVSP", "IBOVESPA")
+                    display_symbol = AssetService._convert_symbol_for_frontend(symbol)
                     indices_data.append({
                         "symbol": display_symbol,
                         "name": name,
@@ -364,6 +378,29 @@ class AssetService:
                     "decliningStocks": 0
                 }
             }
+    
+    @staticmethod
+    def _convert_symbol_for_frontend(symbol: str) -> str:
+        """
+        Converte símbolos do Yahoo Finance para o formato usado no frontend
+        """
+        symbol_mapping = {
+            "^BVSP": "IBOVESPA",
+            "IFIX.SA": "IFIX",
+            "SMAL11.SA": "SMLL",
+            "DIVO11.SA": "IDIV",
+            "^GSPC": "SPX",
+            "^IXIC": "IXIC",
+            "^DJI": "DJI",
+            "^GDAXI": "DAX",
+            "^FTSE": "UKX",
+            "^FCHI": "CAC",
+            "^N225": "NKY",
+            "^HSI": "HSI",
+            "000001.SS": "SHCOMP",
+            "^KS11": "KOSPI"
+        }
+        return symbol_mapping.get(symbol, symbol)
     
     @staticmethod
     def get_multiple_assets(symbols: List[str]) -> Dict[str, Dict[str, Any]]:

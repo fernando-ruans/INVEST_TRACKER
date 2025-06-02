@@ -68,9 +68,10 @@ const Dashboard: React.FC = () => {
       setMarketOverview(overview);
     } catch (error) {
       console.error('Erro ao carregar visão geral do mercado:', error);
-      // Fallback com dados básicos dos principais índices
+      // Fallback com dados básicos dos principais índices mundiais
       setMarketOverview({
         indices: [
+          // Brasil
           {
             symbol: 'IBOVESPA',
             name: 'Ibovespa',
@@ -85,16 +86,75 @@ const Dashboard: React.FC = () => {
             change: 0,
             changePercent: 0
           },
+          // Estados Unidos
           {
-            symbol: 'SMLL',
-            name: 'Small Cap',
+            symbol: 'SPX',
+            name: 'S&P 500',
             price: 0,
             change: 0,
             changePercent: 0
           },
           {
-            symbol: 'IDIV',
-            name: 'Dividendos',
+            symbol: 'IXIC',
+            name: 'Nasdaq',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          {
+            symbol: 'DJI',
+            name: 'Dow Jones',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          // Europa
+          {
+            symbol: 'DAX',
+            name: 'DAX 40',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          {
+            symbol: 'UKX',
+            name: 'FTSE 100',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          {
+            symbol: 'CAC',
+            name: 'CAC 40',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          // Ásia
+          {
+            symbol: 'NKY',
+            name: 'Nikkei 225',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          {
+            symbol: 'HSI',
+            name: 'Hang Seng',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          {
+            symbol: 'SHCOMP',
+            name: 'Shanghai',
+            price: 0,
+            change: 0,
+            changePercent: 0
+          },
+          {
+            symbol: 'KOSPI',
+            name: 'KOSPI',
             price: 0,
             change: 0,
             changePercent: 0
@@ -363,149 +423,262 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Gráfico Principal */}
-          <div className="lg:col-span-2">
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Gráfico - {selectedSymbol}
-                </h3>
-              </div>
-              <div className="p-6">
-                {selectedSymbol ? (
-                  <AdvancedTradingViewChart symbol={selectedSymbol} height={400} />
-                ) : (
-                  <div className="flex items-center justify-center h-96 bg-gray-50 border border-gray-200 rounded-lg">
-                    <div className="text-center">
-                      <div className="text-4xl mb-4">📊</div>
-                      <p className="text-gray-500">Selecione um ativo para visualizar o gráfico</p>
-                    </div>
+        {/* Gráfico Principal - Largura Total */}
+        <div className="mb-8">
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">
+                Gráfico - {selectedSymbol}
+              </h3>
+            </div>
+            <div className="p-6">
+              {selectedSymbol ? (
+                <AdvancedTradingViewChart symbol={selectedSymbol} height={600} />
+              ) : (
+                <div className="flex items-center justify-center h-96 bg-gray-50 border border-gray-200 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-4xl mb-4">📊</div>
+                    <p className="text-gray-500">Selecione um ativo para visualizar o gráfico</p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Cards Informativos - Abaixo do Gráfico */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Índices Principais */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Índices Principais</h3>
+            </div>
+            <div className="p-6 max-h-[500px] overflow-y-auto">
+              {marketOverview && marketOverview.indices && marketOverview.indices.length > 0 ? (
+                <div className="space-y-6">
+                  {/* Brasil */}
+                  {marketOverview.indices.filter(index => ['IBOVESPA', 'IFIX', 'SMLL', 'IDIV'].includes(index.symbol)).length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wide">BRASIL</h4>
+                      <div className="space-y-3">
+                        {marketOverview.indices
+                          .filter(index => ['IBOVESPA', 'IFIX', 'SMLL', 'IDIV'].includes(index.symbol))
+                          .map((index) => (
+                            <div 
+                              key={index.symbol} 
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              onClick={() => {
+                                if (index.symbol && index.symbol.trim() !== '') {
+                                  setSelectedSymbol(index.symbol);
+                                }
+                              }}
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
+                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
+                                </p>
+                                <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
+                                  {index.changePercent && index.changePercent !== 0 ? formatPercent(index.changePercent) : '--'}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Estados Unidos */}
+                   {marketOverview.indices.filter(index => ['SPX', 'IXIC', 'DJI'].includes(index.symbol)).length > 0 && (
+                     <div>
+                       <h4 className="text-sm font-semibold text-green-600 mb-3 uppercase tracking-wide">ESTADOS UNIDOS</h4>
+                       <div className="space-y-3">
+                         {marketOverview.indices
+                           .filter(index => ['SPX', 'IXIC', 'DJI'].includes(index.symbol))
+                          .map((index) => (
+                            <div 
+                              key={index.symbol} 
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              onClick={() => {
+                                if (index.symbol && index.symbol.trim() !== '') {
+                                  setSelectedSymbol(index.symbol);
+                                }
+                              }}
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
+                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
+                                </p>
+                                <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
+                                  {index.changePercent && index.changePercent !== 0 ? formatPercent(index.changePercent) : '--'}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Europa */}
+                   {marketOverview.indices.filter(index => ['DAX', 'UKX', 'CAC'].includes(index.symbol)).length > 0 && (
+                     <div>
+                       <h4 className="text-sm font-semibold text-purple-600 mb-3 uppercase tracking-wide">EUROPA</h4>
+                       <div className="space-y-3">
+                         {marketOverview.indices
+                           .filter(index => ['DAX', 'UKX', 'CAC'].includes(index.symbol))
+                          .map((index) => (
+                            <div 
+                              key={index.symbol} 
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              onClick={() => {
+                                if (index.symbol && index.symbol.trim() !== '') {
+                                  setSelectedSymbol(index.symbol);
+                                }
+                              }}
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
+                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
+                                </p>
+                                <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
+                                  {index.changePercent && index.changePercent !== 0 ? formatPercent(index.changePercent) : '--'}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Ásia */}
+                   {marketOverview.indices.filter(index => ['NKY', 'HSI', 'SHCOMP', 'KOSPI'].includes(index.symbol)).length > 0 && (
+                     <div>
+                       <h4 className="text-sm font-semibold text-red-600 mb-3 uppercase tracking-wide">ÁSIA</h4>
+                       <div className="space-y-3">
+                         {marketOverview.indices
+                           .filter(index => ['NKY', 'HSI', 'SHCOMP', 'KOSPI'].includes(index.symbol))
+                          .map((index) => (
+                            <div 
+                              key={index.symbol} 
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              onClick={() => {
+                                if (index.symbol && index.symbol.trim() !== '') {
+                                  setSelectedSymbol(index.symbol);
+                                }
+                              }}
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
+                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
+                                </p>
+                                <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
+                                  {index.changePercent && index.changePercent !== 0 ? formatPercent(index.changePercent) : '--'}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">📈</div>
+                    <p className="text-gray-500 text-sm">Dados de mercado indisponíveis</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Índices Principais */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Índices Principais</h3>
+          {/* Eventos de Hoje */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center">
+                <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                <h3 className="text-lg font-medium text-gray-900">Eventos de Hoje</h3>
               </div>
-              <div className="p-6">
-                {marketOverview && marketOverview.indices && marketOverview.indices.length > 0 ? (
-                  <div className="space-y-4">
-                    {marketOverview.indices.slice(0, 4).map((index) => (
-                      <div 
-                        key={index.symbol} 
-                        className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
-                        onClick={() => {
-                          if (index.symbol && index.symbol.trim() !== '') {
-                            setSelectedSymbol(index.symbol);
-                          }
-                        }}
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{index.name}</p>
-                          <p className="text-xs text-gray-500">{index.symbol}</p>
+            </div>
+            <div className="p-6">
+              {todayEvents.length > 0 ? (
+                <div className="space-y-3">
+                  {todayEvents.map((event) => (
+                    <div key={event.id} className="border-l-4 border-primary-400 pl-3">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{event.title}</p>
+                          <p className="text-xs text-gray-500">{event.country}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900">
-                            {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
-                          </p>
-                          <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
-                            {index.changePercent && index.changePercent !== 0 ? formatPercent(index.changePercent) : '--'}
-                          </p>
-                        </div>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getImportanceColor(event.importance)}`}>
+                          {event.importance}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="text-center">
-                      <div className="text-2xl mb-2">📈</div>
-                      <p className="text-gray-500 text-sm">Dados de mercado indisponíveis</p>
+                      {event.time && (
+                        <p className="text-xs text-gray-400 mt-1">{event.time}</p>
+                      )}
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">Nenhum evento importante hoje.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Notícias */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center">
+                <Newspaper className="h-5 w-5 text-gray-400 mr-2" />
+                <h3 className="text-lg font-medium text-gray-900">Últimas Notícias</h3>
               </div>
             </div>
-
-            {/* Eventos de Hoje */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center">
-                  <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                  <h3 className="text-lg font-medium text-gray-900">Eventos de Hoje</h3>
-                </div>
-              </div>
-              <div className="p-6">
-                {todayEvents.length > 0 ? (
-                  <div className="space-y-3">
-                    {todayEvents.map((event) => (
-                      <div key={event.id} className="border-l-4 border-primary-400 pl-3">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                            <p className="text-xs text-gray-500">{event.country}</p>
-                          </div>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getImportanceColor(event.importance)}`}>
-                            {event.importance}
-                          </span>
-                        </div>
-                        {event.time && (
-                          <p className="text-xs text-gray-400 mt-1">{event.time}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500">Nenhum evento importante hoje.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Notícias */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center">
-                  <Newspaper className="h-5 w-5 text-gray-400 mr-2" />
-                  <h3 className="text-lg font-medium text-gray-900">Últimas Notícias</h3>
-                </div>
-              </div>
-              <div className="p-6">
-                {news.length > 0 ? (
-                  <div className="space-y-4">
-                    {news.map((article, index) => (
-                      <div key={index} className="border-b border-gray-100 last:border-b-0 pb-3 last:pb-0">
-                        <a
-                          href={article.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block hover:bg-gray-50 -m-2 p-2 rounded"
-                        >
-                          <p className="text-sm font-medium text-gray-900 line-clamp-2">
-                            {article.title}
+            <div className="p-6">
+              {news.length > 0 ? (
+                <div className="space-y-4">
+                  {news.map((article, index) => (
+                    <div key={index} className="border-b border-gray-100 last:border-b-0 pb-3 last:pb-0">
+                      <a
+                        href={article.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block hover:bg-gray-50 -m-2 p-2 rounded"
+                      >
+                        <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                          {article.title}
+                        </p>
+                        <div className="flex justify-between items-center mt-2">
+                          <p className="text-xs text-gray-500">{article.source}</p>
+                          <p className="text-xs text-gray-400">
+                            {article.publishedDate && !isNaN(new Date(article.publishedDate).getTime()) 
+                              ? format(new Date(article.publishedDate), 'dd/MM HH:mm', { locale: ptBR })
+                              : 'Data não disponível'
+                            }
                           </p>
-                          <div className="flex justify-between items-center mt-2">
-                            <p className="text-xs text-gray-500">{article.source}</p>
-                            <p className="text-xs text-gray-400">
-                              {article.publishedDate && !isNaN(new Date(article.publishedDate).getTime()) 
-                                ? format(new Date(article.publishedDate), 'dd/MM HH:mm', { locale: ptBR })
-                                : 'Data não disponível'
-                              }
-                            </p>
-                          </div>
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500">Nenhuma notícia disponível.</p>
-                )}
-              </div>
+                        </div>
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">Nenhuma notícia disponível.</p>
+              )}
             </div>
           </div>
         </div>
