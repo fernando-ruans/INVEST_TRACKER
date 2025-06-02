@@ -42,6 +42,52 @@ class NewsService:
         return text.strip()
     
     @staticmethod
+    def _categorize_news(title: str, description: str) -> str:
+        """
+        Categoriza a notícia baseado no título e descrição
+        """
+        content = f"{title} {description}".lower()
+        
+        # Palavras-chave para cada categoria com pesos
+        categories = {
+            "stocks": {
+                "keywords": ["stock", "shares", "equity", "ipo", "earnings", "dividend", "market cap", "nasdaq", "nyse", "s&p", "dow jones", "wall street", "trading", "investor", "shareholder", "quarterly", "revenue", "profit", "loss", "analyst", "upgrade", "downgrade"],
+                "weight": 1
+            },
+            "crypto": {
+                "keywords": ["bitcoin", "ethereum", "crypto", "cryptocurrency", "blockchain", "defi", "nft", "binance", "coinbase", "altcoin", "mining", "btc", "eth", "digital currency", "token", "wallet", "exchange"],
+                "weight": 2
+            },
+            "forex": {
+                "keywords": ["forex", "currency", "dollar", "euro", "yen", "pound", "exchange rate", "fed", "federal reserve", "central bank", "interest rate", "monetary policy", "inflation", "usd", "eur", "gbp", "jpy"],
+                "weight": 2
+            },
+            "commodities": {
+                "keywords": ["gold", "silver", "oil", "crude", "copper", "wheat", "corn", "natural gas", "commodity", "futures", "brent", "wti", "precious metals", "agriculture", "energy"],
+                "weight": 2
+            },
+            "economy": {
+                "keywords": ["gdp", "unemployment", "inflation", "recession", "economic growth", "trade war", "tariff", "export", "import", "manufacturing", "factory", "industrial", "economic data", "consumer", "retail"],
+                "weight": 1
+            }
+        }
+        
+        # Contar matches para cada categoria com pesos
+        category_scores = {}
+        for category, data in categories.items():
+            keywords = data["keywords"]
+            weight = data["weight"]
+            score = sum(weight for keyword in keywords if keyword in content)
+            if score > 0:
+                category_scores[category] = score
+        
+        # Retornar a categoria com maior score, ou 'financial' como padrão
+        if category_scores:
+            return max(category_scores, key=category_scores.get)
+        
+        return "financial"
+    
+    @staticmethod
     def _is_cache_valid(cache_key: str) -> bool:
         """
         Verifica se o cache ainda é válido
@@ -114,13 +160,16 @@ class NewsService:
                 if len(description) > 300:
                     description = description[:297] + "..."
                 
+                # Categorizar baseado no conteúdo
+                category = NewsService._categorize_news(entry.title, description)
+                
                 news_item = {
                     "title": NewsService._clean_html(entry.title) if hasattr(entry, 'title') else "Sem título",
                     "description": description,
                     "url": entry.link if hasattr(entry, 'link') else "",
                     "published_at": published_date.isoformat(),
                     "source": source,
-                    "category": "financial"
+                    "category": category
                 }
                 
                 news_items.append(news_item)

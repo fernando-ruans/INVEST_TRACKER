@@ -11,12 +11,13 @@ const News: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const categories = [
-    { value: 'all', label: 'Todas as Notícias' },
-    { value: 'market', label: 'Mercado' },
-    { value: 'stocks', label: 'Ações' },
-    { value: 'crypto', label: 'Criptomoedas' },
-    { value: 'economy', label: 'Economia' },
-    { value: 'earnings', label: 'Resultados' },
+    { id: 'all', name: 'Todas as Notícias', icon: '📰' },
+    { id: 'financial', name: 'Financeiro', icon: '💰' },
+    { id: 'stocks', name: 'Ações', icon: '📈' },
+    { id: 'crypto', name: 'Crypto', icon: '₿' },
+    { id: 'forex', name: 'Forex', icon: '💱' },
+    { id: 'commodities', name: 'Commodities', icon: '🛢️' },
+    { id: 'economy', name: 'Economia', icon: '🏭' }
   ];
 
   useEffect(() => {
@@ -64,40 +65,48 @@ const News: React.FC = () => {
   const handleCategoryChange = async (category: string) => {
     setSelectedCategory(category);
     
-    if (category === 'all') {
-      loadNews();
-      return;
+    // Se não temos notícias carregadas, carregamos todas
+    if (news.length === 0) {
+      await loadNews();
     }
-
-    try {
-      setLoading(true);
-      const data = await newsService.getFinancialNews(20, category);
-      setNews(data);
-    } catch (error) {
-      console.error('Erro ao carregar notícias por categoria:', error);
-    } finally {
-      setLoading(false);
-    }
+    
+    // O filtro será aplicado automaticamente no render através do .filter()
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-      return `${diffInMinutes} min atrás`;
-    } else if (diffInHours < 24) {
-      return `${diffInHours}h atrás`;
-    } else {
-      return date.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      
+      // Verificar se a data é válida
+      if (isNaN(date.getTime())) {
+        return 'Data inválida';
+      }
+      
+      const now = new Date();
+      const diffInMs = now.getTime() - date.getTime();
+      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+      const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+      
+      if (diffInMinutes < 1) {
+        return 'Agora mesmo';
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes} min atrás`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h atrás`;
+      } else if (diffInDays < 7) {
+        return `${diffInDays} dia${diffInDays > 1 ? 's' : ''} atrás`;
+      } else {
+        // Para datas mais antigas, mostrar a data formatada
+        return date.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao formatar data:', error, 'Data original:', dateString);
+      return 'Data inválida';
     }
   };
 
@@ -166,15 +175,16 @@ const News: React.FC = () => {
           <div className="flex space-x-2 overflow-x-auto pb-2">
             {categories.map((category) => (
               <button
-                key={category.value}
-                onClick={() => handleCategoryChange(category.value)}
-                className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-colors ${
-                  selectedCategory === category.value
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  selectedCategory === category.id
                     ? 'bg-primary-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
-                {category.label}
+                <span>{category.icon}</span>
+                {category.name}
               </button>
             ))}
           </div>
@@ -183,22 +193,33 @@ const News: React.FC = () => {
         {/* Lista de Notícias */}
         {news.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {news.map((article, index) => (
-              <NewsCard key={index} article={article} formatDate={formatDate} truncateText={truncateText} />
-            ))}
+            {news
+              .filter(article => {
+                if (selectedCategory === 'all') return true;
+                return article.category === selectedCategory;
+              })
+              .map((article, index) => (
+                <NewsCard key={index} article={article} formatDate={formatDate} truncateText={truncateText} />
+              ))}
           </div>
         ) : (
           <div className="text-center py-12">
             <Newspaper className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhuma notícia encontrada</h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchTerm ? 'Tente buscar com outros termos.' : 'Não há notícias disponíveis no momento.'}
+              {searchTerm 
+                ? 'Tente buscar com outros termos.' 
+                : selectedCategory !== 'all' 
+                  ? 'Não há notícias disponíveis para esta categoria.' 
+                  : 'Não há notícias disponíveis no momento.'
+              }
             </p>
-            {searchTerm && (
+            {(searchTerm || selectedCategory !== 'all') && (
               <div className="mt-6">
                 <button
                   onClick={() => {
                     setSearchTerm('');
+                    setSelectedCategory('all');
                     loadNews();
                   }}
                   className="btn-primary"

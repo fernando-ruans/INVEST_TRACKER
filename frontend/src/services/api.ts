@@ -238,24 +238,40 @@ export const portfolioService = {
   },
 };
 
+// Função para mapear dados de notícias do backend para o formato do frontend
+const mapNewsItem = (backendNews: any): NewsItem => {
+  return {
+    id: backendNews.id?.toString() || Math.random().toString(),
+    title: backendNews.title || 'Título não disponível',
+    description: backendNews.description || '',
+    url: backendNews.url || '#',
+    source: backendNews.source || 'Fonte desconhecida',
+    publishedDate: backendNews.published_at || backendNews.publishedDate || new Date().toISOString(),
+    imageUrl: backendNews.image_url || backendNews.imageUrl,
+    category: backendNews.category,
+    sentiment: backendNews.sentiment as 'positive' | 'negative' | 'neutral' | undefined,
+    relevanceScore: backendNews.relevance_score || backendNews.relevanceScore
+  };
+};
+
 // Serviços de Notícias
 export const newsService = {
   // Obter notícias financeiras
   async getFinancialNews(limit: number = 20, category?: string): Promise<NewsItem[]> {
     let url = `/news?limit=${limit}`;
-    if (category) {
+    if (category && category !== 'all') {
       url += `&category=${category}`;
     }
-    const response: AxiosResponse<ApiResponse<NewsItem[]>> = await api.get(url);
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(url);
+    return response.data.data.map(mapNewsItem);
   },
 
   // Obter notícias de um ativo específico
   async getAssetNews(symbol: string, limit: number = 10): Promise<NewsItem[]> {
-    const response: AxiosResponse<ApiResponse<NewsItem[]>> = await api.get(
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(
       `/news/asset/${symbol}?limit=${limit}`
     );
-    return response.data.data;
+    return response.data.data.map(mapNewsItem);
   },
 
   // Obter categorias de notícias
@@ -266,16 +282,16 @@ export const newsService = {
 
   // Obter notícias em alta
   async getTrendingNews(limit: number = 10): Promise<NewsItem[]> {
-    const response: AxiosResponse<ApiResponse<NewsItem[]>> = await api.get(`/news/trending?limit=${limit}`);
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(`/news/trending?limit=${limit}`);
+    return response.data.data.map(mapNewsItem);
   },
 
   // Buscar notícias
   async searchNews(query: string, limit: number = 15): Promise<NewsItem[]> {
-    const response: AxiosResponse<ApiResponse<NewsItem[]>> = await api.get(
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(
       `/news/search?query=${encodeURIComponent(query)}&limit=${limit}`
     );
-    return response.data.data;
+    return response.data.data.map(mapNewsItem);
   },
 
   // Obter fontes de notícias
@@ -291,9 +307,9 @@ export const newsService = {
   },
 
   // Obter manchetes
-  async getHeadlines(limit: number = 5): Promise<any[]> {
+  async getHeadlines(limit: number = 5): Promise<NewsItem[]> {
     const response: AxiosResponse<ApiResponse<any[]>> = await api.get(`/news/headlines?limit=${limit}`);
-    return response.data.data;
+    return response.data.data.map(mapNewsItem);
   },
 };
 
