@@ -248,13 +248,30 @@ class AssetService:
             results = []
             
             for asset in popular_symbols:
+                # Definir o tipo do ativo com base no campo exchange
+                exchange = asset.get("exchange", "").lower()
+                asset_type = "stock"
+                if exchange == "crypto":
+                    asset_type = "crypto"
+                elif exchange == "forex":
+                    asset_type = "forex"
+                elif exchange in ["comex", "nymex", "ice", "cbot", "cme"]:
+                    asset_type = "commodity"
+                elif exchange == "b3":
+                    if "etf" in asset["name"].lower():
+                        asset_type = "etf"
+                    else:
+                        asset_type = "stock"
+                elif exchange == "bmf":
+                    asset_type = "commodity"
+                asset["type"] = asset_type
+
                 if (query_lower in asset["symbol"].lower() or 
                     query_lower in asset["name"].lower()):
                     results.append(asset)
-                    
                 if len(results) >= limit:
                     break
-            
+
             return results
             
         except Exception as e:

@@ -20,7 +20,29 @@ const SearchPage: React.FC = () => {
     { value: 'crypto', label: 'Criptomoedas' },
     { value: 'forex', label: 'Forex' },
     { value: 'commodities', label: 'Commodities' },
+    { value: 'b3', label: 'B3' },
+    { value: 'bmf', label: 'BMF' },
   ];
+
+  // Filtered search results
+  // Atualiza os resultados filtrados sempre que searchResults ou selectedFilter mudarem
+  const filteredSearchResults = React.useMemo(() => {
+    if (selectedFilter === 'all') return searchResults;
+    return searchResults.filter((result) => {
+      const type = result.type ? result.type.toLowerCase() : '';
+      const exchange = result.exchange ? result.exchange.toUpperCase() : '';
+      if (selectedFilter === 'stocks') return type === 'stock' || type === 'etf';
+      if (selectedFilter === 'crypto') return type === 'crypto';
+      if (selectedFilter === 'forex') return type === 'forex';
+      if (selectedFilter === 'commodities') return type === 'commodity';
+      if (selectedFilter === 'b3') return exchange === 'B3';
+      if (selectedFilter === 'bmf') return exchange === 'BMF';
+      return false;
+    });
+  }, [searchResults, selectedFilter]);
+
+  // Trending assets (no filter, as AssetInfo has no type)
+  const filteredTrendingAssets = trendingAssets;
 
   useEffect(() => {
     loadTrendingAssets();
@@ -69,6 +91,8 @@ const SearchPage: React.FC = () => {
       handleSearch();
     }
   };
+
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,13 +160,13 @@ const SearchPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Search Results */}
           <div className="lg:col-span-2">
-            {searchResults.length > 0 ? (
+            {filteredSearchResults.length > 0 ? (
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Resultados da Busca ({searchResults.length})
+                  Resultados da Busca ({filteredSearchResults.length})
                 </h2>
                 <div className="space-y-4">
-                  {searchResults.map((result, index) => (
+                  {filteredSearchResults.map((result, index) => (
                     <div
                       key={index}
                       className="card p-4 hover:shadow-card-hover transition-shadow cursor-pointer"
@@ -207,7 +231,7 @@ const SearchPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {trendingAssets.map((asset, index) => (
+                    {filteredTrendingAssets.map((asset: AssetInfo, index: number) => (
                       <AssetCard
                         key={index}
                         symbol={asset.symbol}
