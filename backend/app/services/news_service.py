@@ -13,11 +13,22 @@ class NewsService:
     
     # URLs dos feeds RSS
     RSS_FEEDS = {
+        # Fontes Internacionais
         "yahoo_finance": "https://feeds.finance.yahoo.com/rss/2.0/headline",
         "investing_com": "https://www.investing.com/rss/news.rss",
         "marketwatch": "https://feeds.marketwatch.com/marketwatch/topstories/",
         "reuters_business": "https://feeds.reuters.com/reuters/businessNews",
-        "cnbc": "https://www.cnbc.com/id/100003114/device/rss/rss.html"
+        "cnbc": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+        
+        # Fontes Brasileiras
+        "infomoney": "https://www.infomoney.com.br/feed/",
+        "valor_economico": "https://valor.globo.com/rss/home/",
+        "exame": "https://exame.com/feed/",
+        "estadao_economia": "https://economia.estadao.com.br/rss.xml",
+        "folha_mercado": "https://feeds.folha.uol.com.br/mercado/rss091.xml",
+        "g1_economia": "http://g1.globo.com/dynamo/economia/rss2.xml",
+        "uol_economia": "https://economia.uol.com.br/index.xml",
+        "money_times": "https://www.moneytimes.com.br/feed/"
     }
     
     @staticmethod
@@ -48,26 +59,51 @@ class NewsService:
         """
         content = f"{title} {description}".lower()
         
-        # Palavras-chave para cada categoria com pesos
+        # Palavras-chave para cada categoria com pesos (português e inglês)
         categories = {
             "stocks": {
-                "keywords": ["stock", "shares", "equity", "ipo", "earnings", "dividend", "market cap", "nasdaq", "nyse", "s&p", "dow jones", "wall street", "trading", "investor", "shareholder", "quarterly", "revenue", "profit", "loss", "analyst", "upgrade", "downgrade"],
+                "keywords": [
+                    # Inglês
+                    "stock", "shares", "equity", "ipo", "earnings", "dividend", "market cap", "nasdaq", "nyse", "s&p", "dow jones", "wall street", "trading", "investor", "shareholder", "quarterly", "revenue", "profit", "loss", "analyst", "upgrade", "downgrade",
+                    # Português
+                    "ação", "ações", "bolsa", "bovespa", "b3", "ibovespa", "dividendo", "dividendos", "lucro", "prejuízo", "receita", "faturamento", "balanço", "resultado", "trimestre", "acionista", "investidor", "negociação", "pregão", "cotação", "valorização", "desvalorização", "blue chip", "small caps"
+                ],
                 "weight": 1
             },
             "crypto": {
-                "keywords": ["bitcoin", "ethereum", "crypto", "cryptocurrency", "blockchain", "defi", "nft", "binance", "coinbase", "altcoin", "mining", "btc", "eth", "digital currency", "token", "wallet", "exchange"],
+                "keywords": [
+                    # Inglês
+                    "bitcoin", "ethereum", "crypto", "cryptocurrency", "blockchain", "defi", "nft", "binance", "coinbase", "altcoin", "mining", "btc", "eth", "digital currency", "token", "wallet", "exchange",
+                    # Português
+                    "criptomoeda", "criptomoedas", "moeda digital", "carteira digital", "mineração", "exchange", "corretora digital", "mercado bitcoin", "foxbit", "novadax"
+                ],
                 "weight": 2
             },
             "forex": {
-                "keywords": ["forex", "currency", "dollar", "euro", "yen", "pound", "exchange rate", "fed", "federal reserve", "central bank", "interest rate", "monetary policy", "inflation", "usd", "eur", "gbp", "jpy"],
+                "keywords": [
+                    # Inglês
+                    "forex", "currency", "dollar", "euro", "yen", "pound", "exchange rate", "fed", "federal reserve", "central bank", "interest rate", "monetary policy", "inflation", "usd", "eur", "gbp", "jpy",
+                    # Português
+                    "dólar", "real", "euro", "câmbio", "taxa de câmbio", "banco central", "copom", "selic", "política monetária", "inflação", "ipca", "igp-m", "ptax", "moeda", "valorização do real", "desvalorização do real"
+                ],
                 "weight": 2
             },
             "commodities": {
-                "keywords": ["gold", "silver", "oil", "crude", "copper", "wheat", "corn", "natural gas", "commodity", "futures", "brent", "wti", "precious metals", "agriculture", "energy"],
+                "keywords": [
+                    # Inglês
+                    "gold", "silver", "oil", "crude", "copper", "wheat", "corn", "natural gas", "commodity", "futures", "brent", "wti", "precious metals", "agriculture", "energy",
+                    # Português
+                    "ouro", "prata", "petróleo", "cobre", "minério de ferro", "soja", "milho", "café", "açúcar", "boi gordo", "commodities", "agronegócio", "vale", "petrobras", "pré-sal", "etanol"
+                ],
                 "weight": 2
             },
             "economy": {
-                "keywords": ["gdp", "unemployment", "inflation", "recession", "economic growth", "trade war", "tariff", "export", "import", "manufacturing", "factory", "industrial", "economic data", "consumer", "retail"],
+                "keywords": [
+                    # Inglês
+                    "gdp", "unemployment", "inflation", "recession", "economic growth", "trade war", "tariff", "export", "import", "manufacturing", "factory", "industrial", "economic data", "consumer", "retail",
+                    # Português
+                    "pib", "crescimento econômico", "recessão", "desemprego", "emprego", "caged", "pnad", "ibc-br", "atividade econômica", "indústria", "serviços", "varejo", "pmc", "pim", "exportação", "importação", "balança comercial", "déficit", "superávit", "governo", "orçamento", "fiscal"
+                ],
                 "weight": 1
             }
         }
