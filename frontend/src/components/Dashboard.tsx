@@ -3,7 +3,7 @@ import { TrendingUp, TrendingDown, DollarSign, Activity, Calendar, Newspaper, Al
 import { assetService, portfolioService, newsService, calendarService } from '../services/api';
 import { MarketOverview, Portfolio, NewsItem, EconomicEvent, DashboardStats } from '../types';
 import AssetSearch from './AssetSearch';
-import { SimpleTradingViewChart } from './TradingViewChart';
+import { AdvancedTradingViewChart } from './TradingViewChart';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -374,7 +374,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="p-6">
                 {selectedSymbol ? (
-                  <SimpleTradingViewChart symbol={selectedSymbol} height={400} />
+                  <AdvancedTradingViewChart symbol={selectedSymbol} height={400} />
                 ) : (
                   <div className="flex items-center justify-center h-96 bg-gray-50 border border-gray-200 rounded-lg">
                     <div className="text-center">

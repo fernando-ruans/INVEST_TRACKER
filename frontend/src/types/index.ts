@@ -123,25 +123,8 @@ export interface WatchlistItem {
   addedAt: string;
 }
 
-// Interface para configuração do TradingView
-export interface TradingViewConfig {
-  autosize?: boolean;
-  symbol: string;
-  interval: string;
-  theme: 'light' | 'dark';
-  style: string;
-  locale: string;
-  timezone: string;
-  toolbar_bg: string;
-  enable_publishing: boolean;
-  withdateranges: boolean;
-  hide_side_toolbar: boolean;
-  allow_symbol_change: boolean;
-  save_image: boolean;
-  container_id: string;
-  width: string | number;
-  height: string | number;
-}
+// Interface para configuração do TradingView (movida para TradingViewChart.tsx)
+// export interface TradingViewConfig - agora definida no componente
 
 // Interfaces para respostas da API
 export interface ApiResponse<T> {

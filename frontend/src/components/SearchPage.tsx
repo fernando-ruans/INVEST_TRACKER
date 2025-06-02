@@ -3,7 +3,7 @@ import { Search, Filter, TrendingUp, Star, BarChart3 } from 'lucide-react';
 import { assetService } from '../services/api';
 import { AssetSearchResult, AssetInfo } from '../types';
 import AssetCard from './AssetCard';
-import { SimpleTradingViewChart } from './TradingViewChart';
+import { AdvancedTradingViewChart } from './TradingViewChart';
 
 const SearchPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -248,7 +248,7 @@ const SearchPage: React.FC = () => {
           <div className="lg:col-span-1">
             {selectedAsset ? (
               <div className="sticky top-8">
-                <div className="card p-6">
+                <div className="card p-8"> {/* Increased padding for larger card */}
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
                       Detalhes do Ativo
@@ -260,19 +260,27 @@ const SearchPage: React.FC = () => {
                       ×
                     </button>
                   </div>
-                  
                   <AssetCard symbol={selectedAsset.symbol} />
-                  
+                  {/* Main Indices Section */}
+                  <div className="mt-6">
+                    <h4 className="text-sm font-medium text-gray-900 mb-3">Índices Principais</h4>
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      {['IBOVESPA', 'IFIX', 'SMLL', 'IDIV'].map((indice) => (
+                        <div key={indice} className="card p-3 flex-1 min-w-[120px] max-w-[150px] text-center">
+                          <AssetCard symbol={indice} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <div className="mt-6">
                     <h4 className="text-sm font-medium text-gray-900 mb-3">Gráfico</h4>
-                    <div className="h-64">
-                      <SimpleTradingViewChart
-                        symbol={selectedAsset.symbol}
-                        height={256}
+                    <div className="h-96"> {/* Increased height for better visualization */}
+                      <AdvancedTradingViewChart
+                        symbol={selectedAsset?.symbol || ''}
+                        height={500}
                       />
                     </div>
                   </div>
-                  
                   <div className="mt-6 space-y-3">
                     <button className="btn-primary w-full">
                       Adicionar ao Portfólio
