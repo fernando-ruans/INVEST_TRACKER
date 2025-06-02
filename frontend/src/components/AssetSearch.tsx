@@ -153,6 +153,7 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
 
   // Obter ícone do tipo de ativo
   const getAssetTypeIcon = (type: string) => {
+    if (!type) return '📈';
     switch (type.toLowerCase()) {
       case 'crypto':
         return '₿';
@@ -169,6 +170,7 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
 
   // Obter cor do tipo de ativo
   const getAssetTypeColor = (type: string) => {
+    if (!type) return 'text-gray-600';
     switch (type.toLowerCase()) {
       case 'crypto':
         return 'text-orange-600';
@@ -250,7 +252,7 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
                     <div className="flex items-center space-x-2">
                       <span className="font-medium text-gray-900">{asset.symbol}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${getAssetTypeColor(asset.type)} bg-gray-100`}>
-                        {asset.type.toUpperCase()}
+                        {asset.type ? asset.type.toUpperCase() : 'STOCK'}
                       </span>
                     </div>
                     <div className="text-sm text-gray-500 truncate max-w-xs">
