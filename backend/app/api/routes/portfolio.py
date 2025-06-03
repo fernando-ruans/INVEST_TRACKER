@@ -20,7 +20,8 @@ async def create_portfolio(
     """
     try:
         portfolio = PortfolioService.create_portfolio(db, portfolio_data)
-        return {"success": True, "data": portfolio}
+        portfolio_response = PortfolioResponse.from_orm(portfolio)
+        return {"success": True, "data": portfolio_response.dict()}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -31,7 +32,8 @@ async def get_portfolios(db: Session = Depends(get_db)):
     """
     try:
         portfolios = PortfolioService.get_portfolios(db)
-        return {"success": True, "data": portfolios}
+        portfolios_response = [PortfolioResponse.from_orm(p).dict() for p in portfolios]
+        return {"success": True, "data": portfolios_response}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -47,7 +49,8 @@ async def get_portfolio(
         portfolio = PortfolioService.get_portfolio(db, portfolio_id)
         if not portfolio:
             raise HTTPException(status_code=404, detail="Portfolio não encontrado")
-        return {"success": True, "data": portfolio}
+        portfolio_response = PortfolioResponse.from_orm(portfolio)
+        return {"success": True, "data": portfolio_response.dict()}
     except HTTPException:
         raise
     except Exception as e:
@@ -66,7 +69,8 @@ async def update_portfolio(
         portfolio = PortfolioService.update_portfolio(db, portfolio_id, portfolio_data)
         if not portfolio:
             raise HTTPException(status_code=404, detail="Portfolio não encontrado")
-        return {"success": True, "data": portfolio}
+        portfolio_response = PortfolioResponse.from_orm(portfolio)
+        return {"success": True, "data": portfolio_response.dict()}
     except HTTPException:
         raise
     except Exception as e:
@@ -101,7 +105,8 @@ async def add_asset_to_portfolio(
     """
     try:
         asset = PortfolioService.add_asset_to_portfolio(db, portfolio_id, asset_data)
-        return {"success": True, "data": asset}
+        asset_response = PortfolioAssetResponse.from_orm(asset)
+        return {"success": True, "data": asset_response.dict()}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -115,6 +120,7 @@ async def get_portfolio_assets(
     """
     try:
         assets = PortfolioService.get_portfolio_assets(db, portfolio_id)
+        # Como agora o serviço retorna dicionários, não precisamos usar from_orm
         return {"success": True, "data": assets}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -132,7 +138,8 @@ async def update_portfolio_asset(
         asset = PortfolioService.update_portfolio_asset(db, asset_id, asset_data)
         if not asset:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
-        return {"success": True, "data": asset}
+        asset_response = PortfolioAssetResponse.from_orm(asset)
+        return {"success": True, "data": asset_response.dict()}
     except HTTPException:
         raise
     except Exception as e:

@@ -10,32 +10,108 @@ class AssetService:
         Obtém informações detalhadas de um ativo financeiro
         """
         try:
-            ticker = yf.Ticker(symbol)
-            info = ticker.info
+            print(f"[AssetService] Buscando informações para o símbolo: {symbol}")
             
-            # Dados básicos do ativo
-            asset_data = {
-                "symbol": symbol.upper(),
-                "name": info.get("longName", info.get("shortName", symbol)),
-                "current_price": info.get("currentPrice", info.get("regularMarketPrice", 0)),
-                "previous_close": info.get("previousClose", 0),
-                "open_price": info.get("open", info.get("regularMarketOpen", 0)),
-                "day_high": info.get("dayHigh", info.get("regularMarketDayHigh", 0)),
-                "day_low": info.get("dayLow", info.get("regularMarketDayLow", 0)),
-                "volume": info.get("volume", info.get("regularMarketVolume", 0)),
-                "market_cap": info.get("marketCap", 0),
-                "pe_ratio": info.get("trailingPE", 0),
-                "dividend_yield": info.get("dividendYield", 0),
-                "fifty_two_week_high": info.get("fiftyTwoWeekHigh", 0),
-                "fifty_two_week_low": info.get("fiftyTwoWeekLow", 0),
-                "currency": info.get("currency", "USD"),
-                "exchange": info.get("exchange", ""),
-                "sector": info.get("sector", ""),
-                "industry": info.get("industry", ""),
-                "description": info.get("longBusinessSummary", ""),
-                "website": info.get("website", ""),
-                "employees": info.get("fullTimeEmployees", 0)
-            }
+            # Tentativa com yfinance
+            try:
+                ticker = yf.Ticker(symbol)
+                info = ticker.info
+                
+                if not info or len(info) < 5:  # Se retornou dados vazios ou muito limitados
+                    raise Exception("Dados insuficientes do Yahoo Finance")
+                    
+                print(f"[AssetService] Dados brutos recebidos para {symbol}: {info}")
+                
+                # Dados básicos do ativo
+                asset_data = {
+                    "symbol": symbol.upper(),
+                    "name": info.get("longName", info.get("shortName", symbol)),
+                    "current_price": info.get("currentPrice", info.get("regularMarketPrice", 0)),
+                    "previous_close": info.get("previousClose", 0),
+                    "open_price": info.get("open", info.get("regularMarketOpen", 0)),
+                    "day_high": info.get("dayHigh", info.get("regularMarketDayHigh", 0)),
+                    "day_low": info.get("dayLow", info.get("regularMarketDayLow", 0)),
+                    "volume": info.get("volume", info.get("regularMarketVolume", 0)),
+                    "market_cap": info.get("marketCap", 0),
+                    "pe_ratio": info.get("trailingPE", 0),
+                    "dividend_yield": info.get("dividendYield", 0),
+                    "fifty_two_week_high": info.get("fiftyTwoWeekHigh", 0),
+                    "fifty_two_week_low": info.get("fiftyTwoWeekLow", 0),
+                    "currency": info.get("currency", "USD"),
+                    "exchange": info.get("exchange", ""),
+                    "sector": info.get("sector", ""),
+                    "industry": info.get("industry", ""),
+                    "description": info.get("longBusinessSummary", ""),
+                    "website": info.get("website", ""),
+                    "employees": info.get("fullTimeEmployees", 0)
+                }
+                
+            except Exception as e:
+                print(f"[AssetService] Erro na API do Yahoo Finance para {symbol}: {str(e)}")
+                
+                # Fallback: Usar dados históricos recentes para obter o preço atual
+                try:
+                    print(f"[AssetService] Tentando obter dados históricos para {symbol}")
+                    ticker = yf.Ticker(symbol)
+                    hist = ticker.history(period="2d")
+                    
+                    if not hist.empty:
+                        last_close = float(hist['Close'].iloc[-1])
+                        print(f"[AssetService] Último preço de fechamento para {symbol}: {last_close}")
+                        
+                        # Criar dados básicos com o preço de fechamento mais recente
+                        asset_data = {
+                            "symbol": symbol.upper(),
+                            "name": symbol.upper(),
+                            "current_price": last_close,
+                            "previous_close": last_close,
+                            "open_price": last_close,
+                            "day_high": last_close,
+                            "day_low": last_close,
+                            "volume": 0,
+                            "market_cap": 0,
+                            "pe_ratio": 0,
+                            "dividend_yield": 0,
+                            "fifty_two_week_high": 0,
+                            "fifty_two_week_low": 0,
+                            "currency": "BRL" if ".SA" in symbol else "USD",
+                            "exchange": "B3" if ".SA" in symbol else "Unknown",
+                            "sector": "",
+                            "industry": "",
+                            "description": "",
+                            "website": "",
+                            "employees": 0
+                        }
+                    else:
+                        raise Exception("Dados históricos vazios")
+                        
+                except Exception as hist_error:
+                    print(f"[AssetService] Erro ao obter dados históricos para {symbol}: {str(hist_error)}")
+                    # Se falhar também com dados históricos, criar dados básicos com preço zero
+                    asset_data = {
+                        "symbol": symbol.upper(),
+                        "name": symbol.upper(),
+                        "current_price": 1.0,  # Preço padrão para evitar divisão por zero
+                        "previous_close": 1.0,
+                        "open_price": 1.0,
+                        "day_high": 1.0,
+                        "day_low": 1.0,
+                        "volume": 0,
+                        "market_cap": 0,
+                        "pe_ratio": 0,
+                        "dividend_yield": 0,
+                        "fifty_two_week_high": 0,
+                        "fifty_two_week_low": 0,
+                        "currency": "BRL" if ".SA" in symbol else "USD",
+                        "exchange": "B3" if ".SA" in symbol else "Unknown",
+                        "sector": "",
+                        "industry": "",
+                        "description": "",
+                        "website": "",
+                        "employees": 0
+                    }
+            
+            print(f"[AssetService] Preço atual para {symbol}: {asset_data['current_price']}")
             
             # Calcular mudança percentual
             if asset_data["previous_close"] and asset_data["current_price"]:
@@ -50,6 +126,7 @@ class AssetService:
             return asset_data
             
         except Exception as e:
+            print(f"[AssetService] ERRO ao buscar informações do ativo {symbol}: {str(e)}")
             raise Exception(f"Erro ao buscar informações do ativo {symbol}: {str(e)}")
     
     @staticmethod

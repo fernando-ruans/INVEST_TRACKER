@@ -174,19 +174,33 @@ export const portfolioService = {
 
   // Adicionar ativo ao portfolio
   async addAssetToPortfolio(portfolioId: number, data: PortfolioAssetCreate): Promise<PortfolioAsset> {
+    // Converter camelCase para snake_case para o backend
+    const backendData = {
+      symbol: data.symbol,
+      quantity: data.quantity,
+      average_price: data.averagePrice
+    };
+    
     const response: AxiosResponse<ApiResponse<PortfolioAsset>> = await api.post(
       `/portfolio/${portfolioId}/assets`,
-      data
+      backendData
     );
     return response.data.data;
   },
 
   // Obter ativos do portfolio
   async getPortfolioAssets(portfolioId: number): Promise<PortfolioAsset[]> {
-    const response: AxiosResponse<ApiResponse<PortfolioAsset[]>> = await api.get(
-      `/portfolio/${portfolioId}/assets`
-    );
-    return response.data.data;
+    try {
+      console.log(`Fetching portfolio assets for ID: ${portfolioId}`);
+      const response: AxiosResponse<ApiResponse<PortfolioAsset[]>> = await api.get(
+        `/portfolio/${portfolioId}/assets`
+      );
+      console.log('Portfolio assets response:', response.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching portfolio assets:', error);
+      throw error;
+    }
   },
 
   // Atualizar ativo do portfolio
@@ -205,10 +219,17 @@ export const portfolioService = {
 
   // Obter performance do portfolio
   async getPortfolioPerformance(portfolioId: number): Promise<PortfolioPerformance> {
-    const response: AxiosResponse<ApiResponse<PortfolioPerformance>> = await api.get(
-      `/portfolio/${portfolioId}/performance`
-    );
-    return response.data.data;
+    try {
+      console.log(`Fetching portfolio performance for ID: ${portfolioId}`);
+      const response: AxiosResponse<ApiResponse<PortfolioPerformance>> = await api.get(
+        `/portfolio/${portfolioId}/performance`
+      );
+      console.log('Portfolio performance response:', response.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching portfolio performance:', error);
+      throw error;
+    }
   },
 
   // Obter resumo do portfolio

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Edit, Trash2 } from 'lucide-react';
 import { portfolioService, assetService } from '../services/api';
-import { Portfolio as PortfolioType, PortfolioAsset, PortfolioPerformance } from '../types';
+import { Portfolio as PortfolioType, PortfolioAsset, PortfolioPerformance, AssetSearchResult } from '../types';
 import { SimpleTradingViewChart } from './TradingViewChart';
 
 const Portfolio: React.FC = () => {
@@ -43,6 +43,15 @@ const Portfolio: React.FC = () => {
         portfolioService.getPortfolioAssets(portfolioId),
         portfolioService.getPortfolioPerformance(portfolioId)
       ]);
+      console.log('Portfolio assets:', assets);
+      console.log('Portfolio assets detailed:', assets.map(asset => ({
+        symbol: asset.symbol,
+        currentPrice: asset.currentPrice,
+        totalValue: asset.totalValue,
+        profit_loss: asset.gain,
+        profit_loss_percent: asset.gainPercent
+      })));
+      console.log('Portfolio performance:', perf);
       setPortfolioAssets(assets);
       setPerformance(perf);
     } catch (error) {
@@ -88,6 +97,34 @@ const Portfolio: React.FC = () => {
     }
   };
 
+  const deletePortfolio = async (portfolioId: number) => {
+    // Use window.confirm instead of global confirm to avoid ESLint warning
+    if (!window.confirm('Tem certeza que deseja deletar este portfólio? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    
+    try {
+      await portfolioService.deletePortfolio(portfolioId);
+      const updatedPortfolios = portfolios.filter(p => p.id !== portfolioId);
+      setPortfolios(updatedPortfolios);
+      
+      // Se o portfólio deletado era o selecionado, selecionar outro ou limpar
+      if (selectedPortfolio?.id === portfolioId) {
+        if (updatedPortfolios.length > 0) {
+          setSelectedPortfolio(updatedPortfolios[0]);
+        } else {
+          setSelectedPortfolio(null);
+          setPortfolioAssets([]);
+          setPerformance(null);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao deletar portfólio:', error);
+      // Use window.alert instead of global alert
+      window.alert('Erro ao deletar portfólio. Tente novamente.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -123,17 +160,25 @@ const Portfolio: React.FC = () => {
           <div className="mb-6">
             <div className="flex space-x-4 overflow-x-auto pb-2">
               {portfolios.map((portfolio) => (
-                <button
-                  key={portfolio.id}
-                  onClick={() => setSelectedPortfolio(portfolio)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-colors ${
-                    selectedPortfolio?.id === portfolio.id
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
-                  }`}
-                >
-                  {portfolio.name}
-                </button>
+                <div key={portfolio.id} className="flex-shrink-0 flex items-center space-x-2">
+                  <button
+                    onClick={() => setSelectedPortfolio(portfolio)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      selectedPortfolio?.id === portfolio.id
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+                    }`}
+                  >
+                    {portfolio.name}
+                  </button>
+                  <button
+                    onClick={() => deletePortfolio(portfolio.id)}
+                    className="p-2 text-danger-600 hover:text-danger-800 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 rounded-lg transition-colors"
+                    title="Deletar portfólio"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -153,7 +198,7 @@ const Portfolio: React.FC = () => {
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Valor Total</p>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                          R$ {performance.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          R$ {(performance?.totalValue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
                     </div>
@@ -169,9 +214,9 @@ const Portfolio: React.FC = () => {
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ganho/Perda</p>
                         <p className={`text-2xl font-bold ${
-                          performance.totalGain >= 0 ? 'text-success-600' : 'text-danger-600'
+                          (performance?.totalGain || 0) >= 0 ? 'text-success-600' : 'text-danger-600'
                          }`}>
-                           R$ {performance.totalGain.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                           R$ {(performance?.totalGain || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
                     </div>
@@ -187,9 +232,9 @@ const Portfolio: React.FC = () => {
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Retorno (%)</p>
                         <p className={`text-2xl font-bold ${
-                          performance.totalGainPercent >= 0 ? 'text-success-600' : 'text-danger-600'
+                          (performance?.totalGainPercent || 0) >= 0 ? 'text-success-600' : 'text-danger-600'
                          }`}>
-                           {performance.totalGainPercent.toFixed(2)}%
+                           {performance?.totalGainPercent?.toFixed(2) || '0.00'}%
                         </p>
                       </div>
                     </div>
@@ -244,6 +289,9 @@ const Portfolio: React.FC = () => {
                             Preço Médio
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Preço Atual
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Valor Atual
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -266,18 +314,21 @@ const Portfolio: React.FC = () => {
                               {asset.quantity}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                              R$ {asset.averagePrice.toFixed(2)}
+                              R$ {asset.averagePrice?.toFixed(2) || '0.00'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                              R$ {((asset.currentPrice || 0) * asset.quantity).toFixed(2)}
+                              R$ {asset.currentPrice && !isNaN(asset.currentPrice) ? asset.currentPrice.toFixed(2) : '0.00'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                              R$ {(asset.currentPrice && !isNaN(asset.currentPrice) ? (asset.currentPrice * asset.quantity).toFixed(2) : '0.00')}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`text-sm font-medium ${
-                                ((asset.currentPrice || 0) - asset.averagePrice) * asset.quantity >= 0
+                                (asset.gain !== undefined && asset.gain >= 0)
                                   ? 'text-success-600'
                                   : 'text-danger-600'
                               }`}>
-                                R$ {(((asset.currentPrice || 0) - asset.averagePrice) * asset.quantity).toFixed(2)}
+                                R$ {asset.gain ? asset.gain.toFixed(2) : '0.00'}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -427,6 +478,35 @@ const AddAssetModal: React.FC<{
   const [symbol, setSymbol] = useState('');
   const [quantity, setQuantity] = useState('');
   const [averagePrice, setAveragePrice] = useState('');
+  const [searchResults, setSearchResults] = useState<AssetSearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleSymbolChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSymbol(value);
+    
+    if (value.length >= 2) {
+      setIsSearching(true);
+      setShowResults(true);
+      try {
+        const results = await assetService.searchAssets(value);
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Erro ao buscar ativos:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  };
+
+  const handleSelectAsset = (asset: AssetSearchResult) => {
+    setSymbol(asset.symbol);
+    setShowResults(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -445,18 +525,42 @@ const AddAssetModal: React.FC<{
       <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Adicionar Ativo</h3>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Símbolo do Ativo
             </label>
             <input
               type="text"
               value={symbol}
-              onChange={(e) => setSymbol(e.target.value)}
+              onChange={handleSymbolChange}
               className="input"
               placeholder="Ex: PETR4, VALE3, ITUB4"
               required
             />
+            {isSearching && (
+              <div className="absolute right-3 top-9">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+            {showResults && searchResults.length > 0 && (
+              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-md max-h-60 overflow-auto">
+                {searchResults.map((asset) => (
+                  <div
+                    key={asset.symbol}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex justify-between items-center"
+                    onClick={() => handleSelectAsset(asset)}
+                  >
+                    <div>
+                      <div className="font-medium">{asset.symbol}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{asset.name}</div>
+                    </div>
+                    <div className="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
+                      {asset.exchange}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

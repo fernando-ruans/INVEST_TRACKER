@@ -131,14 +131,14 @@ class PortfolioService:
             
             if existing_asset:
                 # Se já existe, atualizar quantidade e preço médio
-                total_value_existing = existing_asset.quantity * existing_asset.purchase_price
-                total_value_new = asset_data.quantity * asset_data.purchase_price
+                total_value_existing = existing_asset.quantity * existing_asset.average_price
+                total_value_new = asset_data.quantity * asset_data.average_price
                 total_quantity = existing_asset.quantity + asset_data.quantity
                 
                 if total_quantity > 0:
                     avg_price = (total_value_existing + total_value_new) / total_quantity
                     existing_asset.quantity = total_quantity
-                    existing_asset.purchase_price = avg_price
+                    existing_asset.average_price = avg_price
                     existing_asset.updated_at = datetime.utcnow()
                     
                     db.commit()
@@ -150,7 +150,7 @@ class PortfolioService:
                 portfolio_id=portfolio_id,
                 symbol=asset_data.symbol.upper(),
                 quantity=asset_data.quantity,
-                purchase_price=asset_data.purchase_price
+                average_price=asset_data.average_price
             )
             
             db.add(portfolio_asset)
@@ -164,7 +164,7 @@ class PortfolioService:
             raise Exception(f"Erro ao adicionar ativo ao portfolio: {str(e)}")
     
     @staticmethod
-    def get_portfolio_assets(db: Session, portfolio_id: int, user_id: int = 1) -> List[PortfolioAsset]:
+    def get_portfolio_assets(db: Session, portfolio_id: int, user_id: int = 1) -> List[Dict[str, Any]]:
         """
         Obtém todos os ativos de um portfolio
         """
@@ -178,7 +178,56 @@ class PortfolioService:
             if not portfolio:
                 raise Exception("Portfolio não encontrado")
             
-            return db.query(PortfolioAsset).filter(PortfolioAsset.portfolio_id == portfolio_id).all()
+            # Obter todos os ativos do portfólio
+            assets = db.query(PortfolioAsset).filter(PortfolioAsset.portfolio_id == portfolio_id).all()
+            
+            # Lista para armazenar os ativos com preços atuais
+            assets_with_prices = []
+            
+            # Buscar preços atuais para cada ativo
+            for asset in assets:
+                try:
+                    print(f"Buscando informações para o ativo: {asset.symbol}")
+                    asset_info = AssetService.get_asset_info(asset.symbol)
+                    current_price = asset_info.get("current_price", 0)
+                    print(f"Preço atual para {asset.symbol}: {current_price}")
+                    
+                    # Criar um dicionário com os dados do ativo e os valores calculados
+                    asset_dict = {
+                        "id": asset.id,
+                        "portfolio_id": asset.portfolio_id,
+                        "symbol": asset.symbol,
+                        "quantity": asset.quantity,
+                        "average_price": asset.average_price,
+                        "current_price": current_price,
+                        "total_value": asset.quantity * current_price,
+                        "profit_loss": (asset.quantity * current_price) - (asset.quantity * asset.average_price),
+                        "profit_loss_percent": ((current_price - asset.average_price) / asset.average_price * 100) if asset.average_price > 0 else 0,
+                        "created_at": asset.created_at,
+                        "updated_at": asset.updated_at
+                    }
+                    
+                    assets_with_prices.append(asset_dict)
+                    
+                except Exception as e:
+                    print(f"Erro ao buscar informações para o ativo {asset.symbol}: {str(e)}")
+                    # Adicionar o ativo mesmo sem preço atual
+                    asset_dict = {
+                        "id": asset.id,
+                        "portfolio_id": asset.portfolio_id,
+                        "symbol": asset.symbol,
+                        "quantity": asset.quantity,
+                        "average_price": asset.average_price,
+                        "current_price": 0,
+                        "total_value": 0,
+                        "profit_loss": 0,
+                        "profit_loss_percent": 0,
+                        "created_at": asset.created_at,
+                        "updated_at": asset.updated_at
+                    }
+                    assets_with_prices.append(asset_dict)
+            
+            return assets_with_prices
             
         except Exception as e:
             raise Exception(f"Erro ao buscar ativos do portfolio: {str(e)}")
@@ -200,8 +249,8 @@ class PortfolioService:
             
             if asset_data.quantity is not None:
                 asset.quantity = asset_data.quantity
-            if asset_data.purchase_price is not None:
-                asset.purchase_price = asset_data.purchase_price
+            if asset_data.average_price is not None:
+                asset.average_price = asset_data.average_price
             
             asset.updated_at = datetime.utcnow()
             
@@ -276,23 +325,27 @@ class PortfolioService:
             # Buscar preços atuais de todos os ativos
             for symbol in symbols:
                 try:
+                    print(f"Buscando informações para o ativo: {symbol}")
                     asset_info = AssetService.get_asset_info(symbol)
-                    current_prices[symbol] = asset_info.get("current_price", 0)
-                except:
+                    current_price = asset_info.get("current_price", 0)
+                    print(f"Preço atual para {symbol}: {current_price}")
+                    current_prices[symbol] = current_price
+                except Exception as e:
+                    print(f"Erro ao buscar informações para o ativo {symbol}: {str(e)}")
                     current_prices[symbol] = 0
             
             # Calcular performance de cada ativo
             for asset in assets:
                 current_price = current_prices.get(asset.symbol, 0)
                 asset_value = asset.quantity * current_price
-                asset_cost = asset.quantity * asset.purchase_price
+                asset_cost = asset.quantity * asset.average_price
                 asset_gain_loss = asset_value - asset_cost
                 asset_gain_loss_percent = (asset_gain_loss / asset_cost * 100) if asset_cost > 0 else 0
                 
                 assets_performance.append({
                     "symbol": asset.symbol,
                     "quantity": asset.quantity,
-                    "purchase_price": asset.purchase_price,
+                    "average_price": asset.average_price,
                     "current_price": current_price,
                     "total_cost": asset_cost,
                     "current_value": asset_value,
