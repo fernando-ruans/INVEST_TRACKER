@@ -298,14 +298,14 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Última atualização: {format(lastUpdate, 'dd/MM/yyyy HH:mm', { locale: ptBR })}
               </p>
             </div>
@@ -334,11 +334,11 @@ const Dashboard: React.FC = () => {
       {/* Error Alert */}
       {error && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <div className="bg-danger-50 border border-danger-200 rounded-md p-4">
+          <div className="bg-danger-50 dark:bg-red-900/20 border border-danger-200 dark:border-red-800 rounded-md p-4">
             <div className="flex">
-              <AlertCircle className="h-5 w-5 text-danger-400" />
+              <AlertCircle className="h-5 w-5 text-danger-400 dark:text-red-400" />
               <div className="ml-3">
-                <p className="text-sm text-danger-800">{error}</p>
+                <p className="text-sm text-danger-800 dark:text-red-300">{error}</p>
               </div>
             </div>
           </div>
@@ -349,16 +349,16 @@ const Dashboard: React.FC = () => {
         {/* Stats Cards */}
         {dashboardStats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <DollarSign className="h-6 w-6 text-gray-400" />
+                    <DollarSign className="h-6 w-6 text-gray-400 dark:text-gray-300" />
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Valor Total</dt>
-                      <dd className="text-lg font-medium text-gray-900">
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Valor Total</dt>
+                      <dd className="text-lg font-medium text-gray-900 dark:text-white">
                         {formatCurrency(dashboardStats.totalPortfolioValue)}
                       </dd>
                     </dl>
@@ -367,15 +367,15 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <TrendingUp className="h-6 w-6 text-gray-400" />
+                    <TrendingUp className="h-6 w-6 text-gray-400 dark:text-gray-300" />
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Ganho Total</dt>
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho Total</dt>
                       <dd className={`text-lg font-medium ${getChangeColor(dashboardStats.totalGain)}`}>
                         {formatCurrency(dashboardStats.totalGain)}
                       </dd>
@@ -385,15 +385,15 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <Activity className="h-6 w-6 text-gray-400" />
+                    <Activity className="h-6 w-6 text-gray-400 dark:text-gray-300" />
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Ganho do Dia</dt>
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho do Dia</dt>
                       <dd className={`text-lg font-medium ${getChangeColor(dashboardStats.dayGain)}`}>
                         {formatCurrency(dashboardStats.dayGain)}
                       </dd>
@@ -403,16 +403,16 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <TrendingUp className="h-6 w-6 text-gray-400" />
+                    <TrendingUp className="h-6 w-6 text-gray-400 dark:text-gray-300" />
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Portfolios</dt>
-                      <dd className="text-lg font-medium text-gray-900">
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Portfolios</dt>
+                      <dd className="text-lg font-medium text-gray-900 dark:text-white">
                         {dashboardStats.portfoliosCount}
                       </dd>
                     </dl>
@@ -425,9 +425,9 @@ const Dashboard: React.FC = () => {
 
         {/* Gráfico Principal - Largura Total */}
         <div className="mb-8">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 Gráfico - {selectedSymbol}
               </h3>
             </div>
@@ -435,10 +435,10 @@ const Dashboard: React.FC = () => {
               {selectedSymbol ? (
                 <AdvancedTradingViewChart symbol={selectedSymbol} height={600} />
               ) : (
-                <div className="flex items-center justify-center h-96 bg-gray-50 border border-gray-200 rounded-lg">
+                <div className="flex items-center justify-center h-96 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
                   <div className="text-center">
                     <div className="text-4xl mb-4">📊</div>
-                    <p className="text-gray-500">Selecione um ativo para visualizar o gráfico</p>
+                    <p className="text-gray-500 dark:text-gray-400">Selecione um ativo para visualizar o gráfico</p>
                   </div>
                 </div>
               )}
@@ -449,9 +449,9 @@ const Dashboard: React.FC = () => {
         {/* Cards Informativos - Abaixo do Gráfico */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Índices Principais */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Índices Principais</h3>
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Índices Principais</h3>
             </div>
             <div className="p-6 max-h-[500px] overflow-y-auto">
               {marketOverview && marketOverview.indices && marketOverview.indices.length > 0 ? (
@@ -459,14 +459,14 @@ const Dashboard: React.FC = () => {
                   {/* Brasil */}
                   {marketOverview.indices.filter(index => ['IBOVESPA', 'IFIX', 'SMLL', 'IDIV'].includes(index.symbol)).length > 0 && (
                     <div>
-                      <h4 className="text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wide">BRASIL</h4>
+                      <h4 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">BRASIL</h4>
                       <div className="space-y-3">
                         {marketOverview.indices
                           .filter(index => ['IBOVESPA', 'IFIX', 'SMLL', 'IDIV'].includes(index.symbol))
                           .map((index) => (
                             <div 
                               key={index.symbol} 
-                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                               onClick={() => {
                                 if (index.symbol && index.symbol.trim() !== '') {
                                   setSelectedSymbol(index.symbol);
@@ -474,11 +474,11 @@ const Dashboard: React.FC = () => {
                               }}
                             >
                               <div>
-                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
-                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{index.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{index.symbol}</p>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">
                                   {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
                                 </p>
                                 <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
@@ -494,7 +494,7 @@ const Dashboard: React.FC = () => {
                   {/* Estados Unidos */}
                    {marketOverview.indices.filter(index => ['SPX', 'IXIC', 'DJI'].includes(index.symbol)).length > 0 && (
                      <div>
-                       <h4 className="text-sm font-semibold text-green-600 mb-3 uppercase tracking-wide">ESTADOS UNIDOS</h4>
+                       <h4 className="text-sm font-semibold text-green-600 dark:text-green-400 mb-3 uppercase tracking-wide">ESTADOS UNIDOS</h4>
                        <div className="space-y-3">
                          {marketOverview.indices
                            .filter(index => ['SPX', 'IXIC', 'DJI'].includes(index.symbol))
@@ -564,14 +564,14 @@ const Dashboard: React.FC = () => {
                   {/* Ásia */}
                    {marketOverview.indices.filter(index => ['NKY', 'HSI', 'SHCOMP', 'KOSPI'].includes(index.symbol)).length > 0 && (
                      <div>
-                       <h4 className="text-sm font-semibold text-red-600 mb-3 uppercase tracking-wide">ÁSIA</h4>
+                       <h4 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-3 uppercase tracking-wide">ÁSIA</h4>
                        <div className="space-y-3">
                          {marketOverview.indices
                            .filter(index => ['NKY', 'HSI', 'SHCOMP', 'KOSPI'].includes(index.symbol))
                           .map((index) => (
                             <div 
                               key={index.symbol} 
-                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                               onClick={() => {
                                 if (index.symbol && index.symbol.trim() !== '') {
                                   setSelectedSymbol(index.symbol);
@@ -579,11 +579,11 @@ const Dashboard: React.FC = () => {
                               }}
                             >
                               <div>
-                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
-                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{index.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{index.symbol}</p>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">
                                   {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
                                 </p>
                                 <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
@@ -600,7 +600,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex items-center justify-center py-8">
                   <div className="text-center">
                     <div className="text-2xl mb-2">📈</div>
-                    <p className="text-gray-500 text-sm">Dados de mercado indisponíveis</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">Dados de mercado indisponíveis</p>
                   </div>
                 </div>
               )}
@@ -608,11 +608,11 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Eventos de Hoje */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                <h3 className="text-lg font-medium text-gray-900">Eventos de Hoje</h3>
+                <Calendar className="h-5 w-5 text-gray-400 dark:text-gray-300 mr-2" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Eventos de Hoje</h3>
               </div>
             </div>
             <div className="p-6">
@@ -622,50 +622,50 @@ const Dashboard: React.FC = () => {
                     <div key={event.id} className="border-l-4 border-primary-400 pl-3">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                          <p className="text-xs text-gray-500">{event.country}</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">{event.title}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{event.country}</p>
                         </div>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getImportanceColor(event.importance)}`}>
                           {event.importance}
                         </span>
                       </div>
                       {event.time && (
-                        <p className="text-xs text-gray-400 mt-1">{event.time}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{event.time}</p>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">Nenhum evento importante hoje.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum evento importante hoje.</p>
               )}
             </div>
           </div>
 
           {/* Notícias */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center">
-                <Newspaper className="h-5 w-5 text-gray-400 mr-2" />
-                <h3 className="text-lg font-medium text-gray-900">Últimas Notícias</h3>
+                <Newspaper className="h-5 w-5 text-gray-400 dark:text-gray-300 mr-2" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Últimas Notícias</h3>
               </div>
             </div>
             <div className="p-6">
               {news.length > 0 ? (
                 <div className="space-y-4">
                   {news.map((article, index) => (
-                    <div key={index} className="border-b border-gray-100 last:border-b-0 pb-3 last:pb-0">
+                    <div key={index} className="border-b border-gray-100 dark:border-gray-700 last:border-b-0 pb-3 last:pb-0">
                       <a
                         href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block hover:bg-gray-50 -m-2 p-2 rounded"
+                        className="block hover:bg-gray-50 dark:hover:bg-gray-700 -m-2 p-2 rounded"
                       >
-                        <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
                           {article.title}
                         </p>
                         <div className="flex justify-between items-center mt-2">
-                          <p className="text-xs text-gray-500">{article.source}</p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{article.source}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
                             {article.publishedDate && !isNaN(new Date(article.publishedDate).getTime()) 
                               ? format(new Date(article.publishedDate), 'dd/MM HH:mm', { locale: ptBR })
                               : 'Data não disponível'
@@ -677,7 +677,7 @@ const Dashboard: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">Nenhuma notícia disponível.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Nenhuma notícia disponível.</p>
               )}
             </div>
           </div>

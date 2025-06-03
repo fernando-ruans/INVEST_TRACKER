@@ -144,21 +144,21 @@ const CalendarPage: React.FC = () => {
 
   if (loading && events.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Calendário Econômico</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Calendário Econômico</h1>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
                 Acompanhe os principais eventos econômicos que podem impactar os mercados.
               </p>
             </div>
@@ -175,11 +175,11 @@ const CalendarPage: React.FC = () => {
 
         {/* Filters */}
         <div className="mb-8">
-          <div className="card p-6">
+          <div className="card dark:bg-gray-800 dark:border-gray-700 p-6">
             <div className="space-y-4">
               {/* View Mode */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Período
                 </label>
                 <div className="flex space-x-2">
@@ -194,7 +194,7 @@ const CalendarPage: React.FC = () => {
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         viewMode === mode.value
                           ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {mode.label}
@@ -206,7 +206,7 @@ const CalendarPage: React.FC = () => {
               {/* Custom Date */}
               {viewMode === 'custom' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Data
                   </label>
                   <input
@@ -221,7 +221,7 @@ const CalendarPage: React.FC = () => {
               {/* Filters Row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     País
                   </label>
                   <select
@@ -238,7 +238,7 @@ const CalendarPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Importância
                   </label>
                   <select
@@ -255,7 +255,7 @@ const CalendarPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Categoria
                   </label>
                   <select
@@ -282,7 +282,7 @@ const CalendarPage: React.FC = () => {
               <div key={date}>
                 <div className="flex items-center space-x-3 mb-4">
                   <Calendar className="h-6 w-6 text-primary-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {formatDate(date)}
                   </h2>
                   <span className="badge-primary">
@@ -292,13 +292,13 @@ const CalendarPage: React.FC = () => {
 
                 <div className="space-y-4">
                   {dateEvents.map((event, index) => (
-                    <div key={index} className="card p-6 hover:shadow-card-hover transition-shadow">
+                    <div key={index} className="card dark:bg-gray-800 dark:border-gray-700 p-6 hover:shadow-card-hover transition-shadow">
                       <div className="flex items-start space-x-4">
                         {/* Time and Importance */}
                         <div className="flex-shrink-0">
                           <div className="flex items-center space-x-2 mb-2">
-                            <Clock className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm font-medium text-gray-900">
+                            <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
                               {event.time ? formatTime(event.time) : 'N/A'}
                             </span>
                           </div>
@@ -315,15 +315,15 @@ const CalendarPage: React.FC = () => {
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                                 {event.title}
                               </h3>
                               {event.description && (
-                                <p className="text-gray-600 text-sm mb-2">
+                                <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
                                   {event.description}
                                 </p>
                               )}
-                              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                                 <div className="flex items-center space-x-1">
                                   <Globe className="h-4 w-4" />
                                   <span>{event.country}</span>
@@ -339,28 +339,28 @@ const CalendarPage: React.FC = () => {
 
                           {/* Forecast vs Actual */}
                           {(event.forecast || event.previous || event.actual) && (
-                            <div className="mt-4 grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div className="mt-4 grid grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                               {event.previous && (
                                 <div>
-                                  <p className="text-xs text-gray-500">Anterior</p>
-                                  <p className="text-sm font-medium text-gray-900">
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">Anterior</p>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
                                     {event.previous}
                                   </p>
                                 </div>
                               )}
                               {event.forecast && (
                                 <div>
-                                  <p className="text-xs text-gray-500">Previsão</p>
-                                  <p className="text-sm font-medium text-gray-900">
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">Previsão</p>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
                                     {event.forecast}
                                   </p>
                                 </div>
                               )}
                               {event.actual && (
                                 <div>
-                                  <p className="text-xs text-gray-500">Atual</p>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">Atual</p>
                                   <p className={`text-sm font-medium ${
-                                    event.actual === event.forecast ? 'text-gray-900' :
+                                    event.actual === event.forecast ? 'text-gray-900 dark:text-white' :
                                     parseFloat(event.actual) > parseFloat(event.forecast || '0') ? 'text-success-600' : 'text-danger-600'
                                   }`}>
                                     {event.actual}
@@ -379,9 +379,9 @@ const CalendarPage: React.FC = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum evento encontrado</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <Calendar className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Nenhum evento encontrado</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Não há eventos econômicos para os filtros selecionados.
             </p>
             <div className="mt-6">

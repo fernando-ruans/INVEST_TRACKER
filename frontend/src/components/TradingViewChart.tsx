@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, memo, useState } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import TradingViewWidget from 'react-tradingview-widget';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Converter símbolos brasileiros para formato TradingView
 const formatSymbolForTradingView = (inputSymbol: string): string => {
@@ -143,11 +144,11 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
   width = '100%',
   height = 400,
   interval = 'D',
-  theme = 'light',
+  theme,
   style = '1',
   locale = 'pt_BR',
   timezone = 'America/Sao_Paulo',
-  toolbar_bg = '#f1f3f6',
+  toolbar_bg,
   enable_publishing = false,
   withdateranges = true,
   hide_side_toolbar = false,
@@ -159,6 +160,9 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
   hide_volume = false,
   range = '',
 }) => {
+  const { theme: contextTheme } = useTheme();
+  const currentTheme = theme || contextTheme;
+  const currentToolbarBg = toolbar_bg || (contextTheme === 'dark' ? '#1f2937' : '#f1f3f6');
   const containerRef = useRef<HTMLDivElement>(null);
   const scriptRef = useRef<HTMLScriptElement | null>(null);
   const widgetRef = useRef<any>(null);
@@ -193,10 +197,10 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
             symbol: symbol,
             interval: interval,
             timezone: timezone,
-            theme: theme,
+            theme: currentTheme,
             style: style,
             locale: locale,
-            toolbar_bg: toolbar_bg,
+            toolbar_bg: currentToolbarBg,
             enable_publishing: enable_publishing,
             withdateranges: withdateranges,
             hide_side_toolbar: hide_side_toolbar,
@@ -213,11 +217,11 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
               "volume.options.showStudyArguments": true,
             },
             overrides: {
-              "paneProperties.background": theme === 'dark' ? "#1e1e1e" : "#ffffff",
-              "paneProperties.vertGridProperties.color": theme === 'dark' ? "#363c4e" : "#f0f3fa",
-              "paneProperties.horzGridProperties.color": theme === 'dark' ? "#363c4e" : "#f0f3fa",
+              "paneProperties.background": currentTheme === 'dark' ? "#1e1e1e" : "#ffffff",
+              "paneProperties.vertGridProperties.color": currentTheme === 'dark' ? "#363c4e" : "#f0f3fa",
+              "paneProperties.horzGridProperties.color": currentTheme === 'dark' ? "#363c4e" : "#f0f3fa",
               "symbolWatermarkProperties.transparency": 90,
-              "scalesProperties.textColor": theme === 'dark' ? "#d1d4dc" : "#787b86",
+              "scalesProperties.textColor": currentTheme === 'dark' ? "#d1d4dc" : "#787b86",
               "mainSeriesProperties.candleStyle.upColor": "#26a69a",
               "mainSeriesProperties.candleStyle.downColor": "#ef5350",
               "mainSeriesProperties.candleStyle.drawWick": true,
@@ -304,7 +308,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
         }
       }
     };
-  }, [symbol, interval, theme, style, width, height]);
+  }, [symbol, interval, currentTheme, style, width, height]);
 
   const containerId = `tradingview_${symbol.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}`;
 
@@ -317,7 +321,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
         style={{
           width: typeof width === 'number' ? `${width}px` : width,
           height: typeof height === 'number' ? `${height}px` : height,
-          background: '#fff',
+          background: contextTheme === 'dark' ? '#1f2937' : '#fff',
           borderRadius: 8,
           minHeight: 320,
         }}
@@ -327,7 +331,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
           href={`https://www.tradingview.com/symbols/${symbol}/`}
           rel="noopener nofollow"
           target="_blank"
-          className="text-xs text-gray-500 hover:text-gray-700"
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         >
           <span className="blue-text">{symbol}</span> por TradingView
         </a>
@@ -341,14 +345,14 @@ export const SimpleTradingViewChart: React.FC<{
   symbol: string;
   height?: number;
   theme?: 'light' | 'dark';
-}> = ({ symbol, height = 300, theme = 'light' }) => {
+}> = ({ symbol, height = 300, theme }) => {
   // Validação do símbolo
   if (!symbol || symbol.trim() === '') {
     return (
-      <div className="flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg" style={{ height }}>
+      <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg" style={{ height }}>
         <div className="text-center">
           <div className="text-4xl mb-4">📊</div>
-          <p className="text-gray-500">Símbolo inválido</p>
+          <p className="text-gray-500 dark:text-gray-400">Símbolo inválido</p>
         </div>
       </div>
     );
@@ -376,7 +380,7 @@ export const AdvancedTradingViewChart: React.FC<{
   height?: number;
   theme?: 'light' | 'dark';
   interval?: string;
-}> = ({ symbol, height = 600, theme = 'light', interval = 'D' }) => {
+}> = ({ symbol, height = 600, theme, interval = 'D' }) => {
   const formattedSymbol = formatSymbolForTradingView(symbol);
   const fallbackSymbol = 'BINANCE:BTCUSDT';
   
@@ -411,7 +415,7 @@ export const MiniTradingViewChart: React.FC<{
   width?: number;
   height?: number;
   theme?: 'light' | 'dark';
-}> = ({ symbol, width = 300, height = 200, theme = 'light' }) => {
+}> = ({ symbol, width = 300, height = 200, theme }) => {
   return (
     <TradingViewChart
       symbol={symbol}

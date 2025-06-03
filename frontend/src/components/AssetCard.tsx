@@ -58,19 +58,19 @@ const AssetCard: React.FC<AssetCardProps> = ({
 
   if (loading) {
     return (
-      <div className="card p-6 animate-pulse">
+      <div className="card dark:bg-gray-800 dark:border-gray-700 p-6 animate-pulse">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <div className="h-6 bg-gray-200 rounded w-20 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-20 mb-2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32"></div>
           </div>
           {showRemoveButton && (
-            <div className="h-8 w-8 bg-gray-200 rounded"></div>
+            <div className="h-8 w-8 bg-gray-200 dark:bg-gray-600 rounded"></div>
           )}
         </div>
         <div className="space-y-2">
-          <div className="h-8 bg-gray-200 rounded w-24"></div>
-          <div className="h-4 bg-gray-200 rounded w-16"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded w-24"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-16"></div>
         </div>
       </div>
     );
@@ -78,16 +78,16 @@ const AssetCard: React.FC<AssetCardProps> = ({
 
   if (error || !assetInfo) {
     return (
-      <div className="card p-6 border-danger-200">
+      <div className="card dark:bg-gray-800 dark:border-gray-700 p-6 border-danger-200 dark:border-red-800">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{symbol}</h3>
-            <p className="text-sm text-danger-600">{error || 'Asset not found'}</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{symbol}</h3>
+            <p className="text-sm text-danger-600 dark:text-red-400">{error || 'Asset not found'}</p>
           </div>
           {showRemoveButton && onRemove && (
             <button
               onClick={onRemove}
-              className="text-gray-400 hover:text-danger-600 transition-colors"
+              className="text-gray-400 dark:text-gray-500 hover:text-danger-600 dark:hover:text-red-400 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -104,15 +104,15 @@ const AssetCard: React.FC<AssetCardProps> = ({
 
   return (
     <div 
-      className={`card p-6 transition-all duration-200 ${
-        onClick ? 'cursor-pointer hover:shadow-lg hover:border-primary-300' : ''
+      className={`card dark:bg-gray-800 dark:border-gray-700 p-6 transition-all duration-200 ${
+        onClick ? 'cursor-pointer hover:shadow-lg hover:border-primary-300 dark:hover:border-primary-600' : ''
       }`}
       onClick={onClick}
     >
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{assetInfo.symbol}</h3>
-          <p className="text-sm text-gray-600 truncate max-w-48">{assetInfo.name}</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{assetInfo.symbol}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-48">{assetInfo.name}</p>
         </div>
         {showRemoveButton && onRemove && (
           <button
@@ -120,7 +120,7 @@ const AssetCard: React.FC<AssetCardProps> = ({
               e.stopPropagation();
               onRemove();
             }}
-            className="text-gray-400 hover:text-danger-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-danger-600 dark:hover:text-red-400 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -132,10 +132,10 @@ const AssetCard: React.FC<AssetCardProps> = ({
       <div className="space-y-3">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(assetInfo.price)}
             </span>
-            <span className={`text-sm font-medium ${priceChange >= 0 ? 'text-success-600' : 'text-danger-600'}`}>
+            <span className={`text-sm font-medium ${priceChange >= 0 ? 'text-success-600 dark:text-green-400' : 'text-danger-600 dark:text-red-400'}`}>
               {priceChange >= 0 ? '↗' : '↘'}
               {formatCurrency(Math.abs(priceChange))} ({Math.abs(priceChangePercent).toFixed(2)}%)
             </span>
@@ -144,20 +144,20 @@ const AssetCard: React.FC<AssetCardProps> = ({
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-gray-500">Market Cap</span>
-            <p className="font-medium">{formatMarketCap(assetInfo.marketCap)}</p>
+            <span className="text-gray-500 dark:text-gray-400">Market Cap</span>
+            <p className="font-medium dark:text-white">{formatMarketCap(assetInfo.marketCap)}</p>
           </div>
           <div>
-            <span className="text-gray-500">Volume</span>
-            <p className="font-medium">{assetInfo.volume ? assetInfo.volume.toLocaleString() : 'N/A'}</p>
+            <span className="text-gray-500 dark:text-gray-400">Volume</span>
+            <p className="font-medium dark:text-white">{assetInfo.volume ? assetInfo.volume.toLocaleString() : 'N/A'}</p>
           </div>
           <div>
-            <span className="text-gray-500">P/E Ratio</span>
-            <p className="font-medium">{assetInfo.peRatio ? assetInfo.peRatio.toFixed(2) : 'N/A'}</p>
+            <span className="text-gray-500 dark:text-gray-400">P/E Ratio</span>
+            <p className="font-medium dark:text-white">{assetInfo.peRatio ? assetInfo.peRatio.toFixed(2) : 'N/A'}</p>
           </div>
           <div>
-            <span className="text-gray-500">Dividend Yield</span>
-            <p className="font-medium">
+            <span className="text-gray-500 dark:text-gray-400">Dividend Yield</span>
+            <p className="font-medium dark:text-white">
               {assetInfo.dividendYield ? `${(assetInfo.dividendYield * 100).toFixed(2)}%` : 'N/A'}
             </p>
           </div>

@@ -90,21 +90,21 @@ const Portfolio: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 dark:border-primary-400"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Portfólios</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Portfólios</h1>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
                 Gerencie seus investimentos e acompanhe o desempenho.
               </p>
             </div>
@@ -129,7 +129,7 @@ const Portfolio: React.FC = () => {
                   className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-colors ${
                     selectedPortfolio?.id === portfolio.id
                       ? 'bg-primary-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
                   }`}
                 >
                   {portfolio.name}
@@ -144,15 +144,15 @@ const Portfolio: React.FC = () => {
             {/* Cards de Performance */}
             {performance && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="card">
+                <div className="card dark:bg-gray-800 dark:border-gray-700">
                   <div className="card-body">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <DollarSign className="h-8 w-8 text-primary-600" />
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-500">Valor Total</p>
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Valor Total</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
                           R$ {performance.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
@@ -160,14 +160,14 @@ const Portfolio: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="card">
+                <div className="card dark:bg-gray-800 dark:border-gray-700">
                   <div className="card-body">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <TrendingUp className="h-8 w-8 text-success-600" />
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-500">Ganho/Perda</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ganho/Perda</p>
                         <p className={`text-2xl font-bold ${
                           performance.totalGain >= 0 ? 'text-success-600' : 'text-danger-600'
                          }`}>
@@ -178,14 +178,14 @@ const Portfolio: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="card">
+                <div className="card dark:bg-gray-800 dark:border-gray-700">
                   <div className="card-body">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <BarChart3 className="h-8 w-8 text-warning-600" />
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-500">Retorno (%)</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Retorno (%)</p>
                         <p className={`text-2xl font-bold ${
                           performance.totalGainPercent >= 0 ? 'text-success-600' : 'text-danger-600'
                          }`}>
@@ -196,15 +196,15 @@ const Portfolio: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="card">
+                <div className="card dark:bg-gray-800 dark:border-gray-700">
                   <div className="card-body">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <PieChart className="h-8 w-8 text-purple-600" />
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-500">Ativos</p>
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ativos</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
                           {portfolioAssets.length}
                         </p>
                       </div>
@@ -215,10 +215,10 @@ const Portfolio: React.FC = () => {
             )}
 
             {/* Lista de Ativos */}
-            <div className="card">
-              <div className="card-header">
+            <div className="card dark:bg-gray-800 dark:border-gray-700">
+              <div className="card-header dark:border-gray-700">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium text-gray-900">Ativos do Portfólio</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Ativos do Portfólio</h3>
                   <button
                     onClick={() => setShowAddAssetModal(true)}
                     className="btn-primary btn-sm"
@@ -231,44 +231,44 @@ const Portfolio: React.FC = () => {
               <div className="card-body p-0">
                 {portfolioAssets.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Ativo
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Quantidade
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Preço Médio
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Valor Atual
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Ganho/Perda
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Ações
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {portfolioAssets.map((asset) => (
-                          <tr key={asset.id} className="hover:bg-gray-50">
+                          <tr key={asset.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">
                                 {asset.symbol}
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                               {asset.quantity}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                               R$ {asset.averagePrice.toFixed(2)}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                               R$ {((asset.currentPrice || 0) * asset.quantity).toFixed(2)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -283,7 +283,7 @@ const Portfolio: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <button
                                 onClick={() => removeAsset(asset.id)}
-                                className="text-danger-600 hover:text-danger-900"
+                                className="text-danger-600 hover:text-danger-900 dark:hover:text-danger-400"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -295,9 +295,9 @@ const Portfolio: React.FC = () => {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <PieChart className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum ativo</h3>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <PieChart className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Nenhum ativo</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                       Adicione ativos ao seu portfólio para começar.
                     </p>
                     <div className="mt-6">
@@ -316,9 +316,9 @@ const Portfolio: React.FC = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <PieChart className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum portfólio</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <PieChart className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Nenhum portfólio</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Crie seu primeiro portfólio para começar a acompanhar seus investimentos.
             </p>
             <div className="mt-6">
@@ -372,11 +372,11 @@ const CreatePortfolioModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Criar Novo Portfólio</h3>
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Criar Novo Portfólio</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Nome do Portfólio
             </label>
             <input
@@ -389,7 +389,7 @@ const CreatePortfolioModal: React.FC<{
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Descrição (opcional)
             </label>
             <textarea
@@ -442,11 +442,11 @@ const AddAssetModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Adicionar Ativo</h3>
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Adicionar Ativo</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Símbolo do Ativo
             </label>
             <input
@@ -459,7 +459,7 @@ const AddAssetModal: React.FC<{
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Quantidade
             </label>
             <input
@@ -474,7 +474,7 @@ const AddAssetModal: React.FC<{
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Preço Médio (R$)
             </label>
             <input

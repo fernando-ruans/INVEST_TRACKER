@@ -117,21 +117,21 @@ const News: React.FC = () => {
 
   if (loading && news.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Notícias Financeiras</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Notícias Financeiras</h1>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
                 Mantenha-se atualizado com as últimas notícias do mercado financeiro.
               </p>
             </div>
@@ -152,14 +152,14 @@ const News: React.FC = () => {
           <div className="flex space-x-4">
             <div className="flex-1 relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-gray-400 dark:text-gray-300" />
               </div>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="input pl-10"
+                className="input pl-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 placeholder="Buscar notícias..."
               />
             </div>
@@ -180,7 +180,7 @@ const News: React.FC = () => {
                 className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                   selectedCategory === category.id
                     ? 'bg-primary-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
                 }`}
               >
                 <span>{category.icon}</span>
@@ -204,9 +204,9 @@ const News: React.FC = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <Newspaper className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhuma notícia encontrada</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <Newspaper className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Nenhuma notícia encontrada</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {searchTerm 
                 ? 'Tente buscar com outros termos.' 
                 : selectedCategory !== 'all' 
@@ -248,7 +248,7 @@ const NewsCard: React.FC<{
   truncateText: (text: string, maxLength: number) => string;
 }> = ({ article, formatDate, truncateText }) => {
   return (
-    <div className="card hover:shadow-card-hover transition-shadow duration-200">
+    <div className="card dark:bg-gray-800 dark:border-gray-700 hover:shadow-card-hover transition-shadow duration-200">
       {/* Imagem da Notícia */}
       {article.imageUrl && (
         <div className="aspect-w-16 aspect-h-9">
@@ -272,27 +272,27 @@ const NewsCard: React.FC<{
               {article.category}
             </span>
           )}
-          <div className="flex items-center text-sm text-gray-500">
+          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <Clock className="h-4 w-4 mr-1" />
             {formatDate(article.publishedDate)}
           </div>
         </div>
 
         {/* Título */}
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
           {article.title}
         </h3>
 
         {/* Descrição */}
         {article.description && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
             {truncateText(article.description, 150)}
           </p>
         )}
 
         {/* Fonte e Link */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-500 dark:text-gray-400">
             {article.source}
           </span>
           <a
