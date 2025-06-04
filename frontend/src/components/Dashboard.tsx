@@ -195,7 +195,7 @@ const Dashboard: React.FC = () => {
 
   const loadNews = async () => {
     try {
-      const headlines = await newsService.getHeadlines(6);
+      const headlines = await newsService.getHeadlines(10);
       setNews(headlines);
     } catch (error) {
       console.error('Erro ao carregar notícias:', error);
@@ -456,7 +456,7 @@ const Dashboard: React.FC = () => {
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">Índices Principais</h3>
             </div>
-            <div className="p-6 max-h-[500px] overflow-y-auto">
+            <div className="p-6 overflow-y-auto">
               {marketOverview && marketOverview.indices && marketOverview.indices.length > 0 ? (
                 <div className="space-y-6">
                   {/* Brasil */}
@@ -621,12 +621,11 @@ const Dashboard: React.FC = () => {
             <div className="p-6">
               <InvestingCalendarWidget 
                 theme={theme === 'dark' ? 'dark' : 'light'}
-                height={400} 
+                height={1000} 
                 width="100%"
                 timeSpan="today"
                 showCountries={['BR', 'US', 'EU', 'GB', 'CN', 'JP']}
                 importanceLevel={3}
-                className="mb-4"
               />
             </div>
           </div>
