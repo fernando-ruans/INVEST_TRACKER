@@ -42,7 +42,11 @@ Set-Location frontend
 
 # Instalar dependências do frontend
 Write-Host "📦 Instalando dependências do frontend..." -ForegroundColor Cyan
-npm install
+npm install --legacy-peer-deps
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Erro ao instalar dependências do frontend" -ForegroundColor Red
+    exit 1
+}
 
 # Build do frontend
 Write-Host "🔨 Fazendo build do frontend..." -ForegroundColor Cyan

@@ -156,6 +156,51 @@ npm start
 3. Instale as dependências do backend e frontend
 4. Execute os servidores
 
+## 🚀 Deploy
+
+Para instruções detalhadas de deploy, consulte:
+- [Guia de Deploy Completo](DEPLOY_GUIDE.md)
+- [Deploy no Render](RENDER_DEPLOY.md)
+- [🚨 Correção de Erros no Render](RENDER_FIX.md) ⭐ **IMPORTANTE**
+
+### ⚠️ Problemas no Render?
+
+Se você recebeu erros como:
+- `No module named uvicorn`
+- `react-scripts: Permission denied`
+
+**👉 Consulte o [RENDER_FIX.md](RENDER_FIX.md) para a solução completa!**
+
+### Deploy Correto no Render
+
+**🔧 Solução:** Deploy separado (recomendado)
+
+1. **Backend (Web Service):**
+   ```
+   Root Directory: backend
+   Build Command: pip install -r requirements.txt
+   Start Command: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+   ```
+
+2. **Frontend (Static Site):**
+   ```
+   Root Directory: frontend
+   Build Command: npm install && npm run build
+   Publish Directory: build
+   ```
+
+3. **Banco PostgreSQL:** Criar separadamente no Render
+
+### Deploy Rápido (Alternativo)
+
+Use o arquivo `render.yaml` para configuração automática:
+```bash
+# Commit o render.yaml e conecte o repositório
+git add render.yaml
+git commit -m "Add Render configuration"
+git push
+```
+
 ## 📝 Licença
 
 MIT License

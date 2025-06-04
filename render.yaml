@@ -1,0 +1,53 @@
+# Configuração do Render para Investment Tracker
+# Este arquivo define os serviços backend e frontend separadamente
+
+services:
+  # Backend API (Web Service)
+  - type: web
+    name: investment-tracker-backend
+    runtime: python3
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+    plan: free
+    rootDir: backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Será configurado manualmente
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: investment-tracker-frontend
+          property: url
+
+  # Frontend React (Static Site)
+  - type: web
+    name: investment-tracker-frontend
+    runtime: static
+    buildCommand: "cd frontend && npm install --legacy-peer-deps && npm run build"
+    staticPublishPath: frontend/build
+    plan: free
+    rootDir: frontend
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: investment-tracker-backend
+          property: url
+        value: "/api"
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
+
+# Banco de dados PostgreSQL
+databases:
+  - name: investment-tracker-db
+    databaseName: investment_tracker
+    user: investment_user
+    plan: free
