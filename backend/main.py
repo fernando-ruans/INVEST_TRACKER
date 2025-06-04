@@ -31,9 +31,14 @@ app = FastAPI(
 )
 
 # Configurar CORS
+origins = [
+    "http://localhost:3000",  # React dev server
+    os.getenv("FRONTEND_URL", "https://investment-tracker-frontend.onrender.com")  # URL de produção
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
