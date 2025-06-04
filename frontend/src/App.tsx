@@ -8,13 +8,42 @@ import AssetCard from './components/AssetCard';
 import AssetSearch from './components/AssetSearch';
 import SearchPage from './components/SearchPage';
 import CalendarPage from './components/CalendarPage';
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
+import ProfilePage from './components/ProfilePage';
 import ThemeToggle from './components/ThemeToggle';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { authService } from './services';
 import { AssetSearchResult } from './types';
 
-const App: React.FC = () => {
+// Configurar token na inicialização
+authService.setupToken();
+
+// Componente para rotas protegidas
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Componente principal da aplicação autenticada
+const AuthenticatedApp: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [selectedAsset, setSelectedAsset] = React.useState<string | null>(null);
+  const { user, logout } = useAuth();
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3, current: true },
@@ -22,21 +51,19 @@ const App: React.FC = () => {
     { name: 'Notícias', href: '/news', icon: Newspaper, current: false },
     { name: 'Calendário', href: '/calendar', icon: Calendar, current: false },
     { name: 'Buscar Ativos', href: '/search', icon: Search, current: false },
+    { name: 'Perfil', href: '/profile', icon: Settings, current: false },
   ];
+
+  const handleLogout = () => {
+    logout();
+  };
 
   const handleAssetSelect = (asset: AssetSearchResult) => {
     setSelectedAsset(asset.symbol);
   };
 
   return (
-    <ThemeProvider>
-      <Router
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
-        <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-gray-900">
+    <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-gray-900">
         {/* Sidebar para mobile */}
         <div className={`fixed inset-0 flex z-40 md:hidden ${sidebarOpen ? '' : 'hidden'}`}>
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
@@ -49,14 +76,14 @@ const App: React.FC = () => {
                 <X className="h-6 w-6 text-white" />
               </button>
             </div>
-            <SidebarContent navigation={navigation} />
+            <SidebarContent navigation={navigation} user={user} onLogout={handleLogout} />
           </div>
         </div>
 
         {/* Sidebar para desktop */}
         <div className="hidden md:flex md:flex-shrink-0">
           <div className="flex flex-col w-64">
-            <SidebarContent navigation={navigation} />
+            <SidebarContent navigation={navigation} user={user} onLogout={handleLogout} />
           </div>
         </div>
 
@@ -74,26 +101,22 @@ const App: React.FC = () => {
               <div className="flex-1 px-4 flex justify-between">
                 <div className="flex-1 flex">
                   <div className="w-full flex md:ml-0">
-                    <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+                    <div className="relative w-full text-gray-400 dark:text-gray-300 focus-within:text-gray-600 dark:focus-within:text-gray-200">
                       <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
                         <Search className="h-5 w-5" />
                       </div>
-                      <AssetSearch
-                        onAssetSelect={handleAssetSelect}
-                        className="w-full"
-                        placeholder="Buscar ativos..."
+                      <input
+                        className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-300 focus:ring-0 focus:border-transparent bg-gray-100 dark:bg-gray-700"
+                        placeholder="Buscar ativos para o gráfico..."
+                        type="search"
                       />
                     </div>
                   </div>
-                </div>
-                <div className="ml-4 flex items-center">
-                  <ThemeToggle />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Área de conteúdo */}
           <main className="flex-1 relative overflow-y-auto focus:outline-none">
             <Routes>
               <Route path="/" element={<Dashboard />} />
@@ -104,18 +127,21 @@ const App: React.FC = () => {
                 element={<SearchPage />} 
               />
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
         </div>
         </div>
-      </Router>
-    </ThemeProvider>
   );
 };
 
 // Componente do conteúdo da sidebar
-const SidebarContent: React.FC<{ navigation: any[] }> = ({ navigation }) => {
+const SidebarContent: React.FC<{ 
+  navigation: any[]; 
+  user: any; 
+  onLogout: () => void; 
+}> = ({ navigation, user, onLogout }) => {
   return (
     <div className="flex flex-col h-0 flex-1 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
       <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -153,12 +179,21 @@ const SidebarContent: React.FC<{ navigation: any[] }> = ({ navigation }) => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center">
-                <span className="text-sm font-medium text-white">U</span>
+                <span className="text-sm font-medium text-white">
+                  {user?.fullName ? user.fullName.charAt(0).toUpperCase() : user?.username?.charAt(0).toUpperCase() || 'U'}
+                </span>
               </div>
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Usuário</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Ver perfil</p>
+            <div className="ml-3 flex-1">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {user?.fullName || user?.username || 'Usuário'}
+              </p>
+              <button
+                onClick={onLogout}
+                className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              >
+                Sair
+              </button>
             </div>
           </div>
           <ThemeToggle />
@@ -169,5 +204,34 @@ const SidebarContent: React.FC<{ navigation: any[] }> = ({ navigation }) => {
 };
 
 
+
+// Componente App principal
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        <AuthProvider>
+          <Routes>
+            {/* Rotas públicas */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            
+            {/* Rotas protegidas */}
+            <Route path="/*" element={
+              <ProtectedRoute>
+                <AuthenticatedApp />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
+  );
+};
 
 export default App;

@@ -1,3 +1,6 @@
+// Exportar tipos de autenticação
+export * from './auth';
+
 // Interfaces para dados de ativos
 export interface AssetInfo {
   symbol: string;

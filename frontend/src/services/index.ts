@@ -6,5 +6,8 @@ export {
   calendarService
 } from './api';
 
-// Export the default axios instance
-export { default as api } from './api';
+// Export the auth service
+export { authService } from './auth';
+
+// Export the axios instance
+export { api } from './api';

@@ -23,13 +23,15 @@ import {
 } from '../types';
 
 // Configuração base do Axios
-const api = axios.create({
+export const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Interceptor para tratamento de erros já configurado no serviço de autenticação
 
 // Interceptor para tratamento de erros
 api.interceptors.response.use(
