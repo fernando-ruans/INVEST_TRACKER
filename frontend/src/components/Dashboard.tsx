@@ -393,9 +393,9 @@ const Dashboard: React.FC = () => {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho do Dia</dt>
-                      <dd className={`text-lg font-medium ${getChangeColor(dashboardStats.dayGain)}`}>
-                        {formatCurrency(dashboardStats.dayGain)}
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho/Perda</dt>
+                      <dd className={`text-lg font-medium ${getChangeColor(dashboardStats.totalGainPercent)}`}>
+                        {formatPercent(dashboardStats.totalGainPercent)}
                       </dd>
                     </dl>
                   </div>
