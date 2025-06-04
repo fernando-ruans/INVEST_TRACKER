@@ -264,10 +264,10 @@ const SearchPage: React.FC = () => {
                   {/* Main Indices Section */}
                   <div className="mt-6">
                     <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Índices Principais</h4>
-                    <div className="flex flex-wrap gap-3 mb-4">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
                       {['IBOVESPA', 'IFIX', 'SMLL', 'IDIV'].map((indice) => (
-                        <div key={indice} className="card dark:bg-gray-700 dark:border-gray-600 p-3 flex-1 min-w-[120px] max-w-[150px] text-center">
-                          <AssetCard symbol={indice} />
+                        <div key={indice} className="card dark:bg-gray-700 dark:border-gray-600 p-1 text-center">
+                          <AssetCard symbol={indice} compact={true} />
                         </div>
                       ))}
                     </div>
