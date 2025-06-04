@@ -270,7 +270,9 @@ class PortfolioService:
         """
         try:
             # Buscar o ativo e verificar se pertence a um portfolio do usuário
-            asset = db.query(PortfolioAsset).join(Portfolio).filter(
+            asset = db.query(PortfolioAsset).join(
+                Portfolio, PortfolioAsset.portfolio_id == Portfolio.id
+            ).filter(
                 PortfolioAsset.id == asset_id,
                 Portfolio.user_id == user_id
             ).first()

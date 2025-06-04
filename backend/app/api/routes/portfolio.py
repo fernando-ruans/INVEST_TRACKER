@@ -154,7 +154,7 @@ async def remove_asset_from_portfolio(
     Remove um ativo do portfolio
     """
     try:
-        success = PortfolioService.remove_asset_from_portfolio(db, asset_id)
+        success = PortfolioService.remove_asset_from_portfolio(db, asset_id, user_id=1)
         if not success:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
         return {"success": True, "message": "Ativo removido com sucesso"}
