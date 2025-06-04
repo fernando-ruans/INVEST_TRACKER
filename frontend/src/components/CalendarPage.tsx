@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Globe, AlertCircle, Filter, RefreshCw } from 'lucide-react';
 import { calendarService } from '../services/api';
 import { EconomicEvent, CalendarFilter } from '../types';
+import InvestingCalendarWidget from './InvestingCalendarWidget';
+import { useTheme } from '../contexts/ThemeContext';
 
 const CalendarPage: React.FC = () => {
+  const { theme } = useTheme();
   const [events, setEvents] = useState<EconomicEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -12,6 +15,7 @@ const CalendarPage: React.FC = () => {
   const [selectedImportance, setSelectedImportance] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'today' | 'week' | 'custom'>('today');
+  const [useInvestingWidget, setUseInvestingWidget] = useState<boolean>(false);
 
   const countries = [
     { value: 'all', label: 'Todos os Países' },
@@ -162,154 +166,193 @@ const CalendarPage: React.FC = () => {
                 Acompanhe os principais eventos econômicos que podem impactar os mercados.
               </p>
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="btn-primary"
-            >
-              <RefreshCw className={`h-5 w-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              Atualizar
-            </button>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="mb-8">
-          <div className="card dark:bg-gray-800 dark:border-gray-700 p-6">
-            <div className="space-y-4">
-              {/* View Mode */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Período
-                </label>
-                <div className="flex space-x-2">
-                  {[
-                    { value: 'today', label: 'Hoje' },
-                    { value: 'week', label: 'Esta Semana' },
-                    { value: 'custom', label: 'Data Específica' },
-                  ].map((mode) => (
-                    <button
-                      key={mode.value}
-                      onClick={() => setViewMode(mode.value as any)}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                        viewMode === mode.value
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                    >
-                      {mode.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Custom Date */}
-              {viewMode === 'custom' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Data
-                  </label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="input"
+            <div className="flex items-center space-x-4">
+              {/* Toggle Widget */}
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Dados Locais</span>
+                <button
+                  onClick={() => setUseInvestingWidget(!useInvestingWidget)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                    useInvestingWidget ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      useInvestingWidget ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                   />
-                </div>
-              )}
-
-              {/* Filters Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    País
-                  </label>
-                  <select
-                    value={selectedCountry}
-                    onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="input"
-                  >
-                    {countries.map((country) => (
-                      <option key={country.value} value={country.value}>
-                        {country.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Importância
-                  </label>
-                  <select
-                    value={selectedImportance}
-                    onChange={(e) => setSelectedImportance(e.target.value)}
-                    className="input"
-                  >
-                    {importanceLevels.map((level) => (
-                      <option key={level.value} value={level.value}>
-                        {level.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Categoria
-                  </label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="input"
-                  >
-                    {categories.map((category) => (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                </button>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Investing.com</span>
               </div>
+              {!useInvestingWidget && (
+                <button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="btn-primary"
+                >
+                  <RefreshCw className={`h-5 w-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                  Atualizar
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Events */}
-        {Object.keys(groupedEvents).length > 0 ? (
-          <div className="space-y-8">
-            {Object.entries(groupedEvents).map(([date, dateEvents]) => (
-              <div key={date}>
-                <div className="flex items-center space-x-3 mb-4">
-                  <Calendar className="h-6 w-6 text-primary-600" />
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {formatDate(date)}
-                  </h2>
-                  <span className="badge-primary">
-                    {dateEvents.length} evento{dateEvents.length !== 1 ? 's' : ''}
-                  </span>
+        {/* Filters - Only show when not using Investing widget */}
+        {!useInvestingWidget && (
+          <div className="mb-8">
+            <div className="card dark:bg-gray-800 dark:border-gray-700 p-6">
+              <div className="space-y-4">
+                {/* View Mode */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Período
+                  </label>
+                  <div className="flex space-x-2">
+                    {[
+                      { value: 'today', label: 'Hoje' },
+                      { value: 'week', label: 'Esta Semana' },
+                      { value: 'custom', label: 'Data Específica' },
+                    ].map((mode) => (
+                      <button
+                        key={mode.value}
+                        onClick={() => setViewMode(mode.value as any)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          viewMode === mode.value
+                            ? 'bg-primary-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {mode.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="space-y-4">
-                  {dateEvents.map((event, index) => (
-                    <div key={index} className="card dark:bg-gray-800 dark:border-gray-700 p-6 hover:shadow-card-hover transition-shadow">
-                      <div className="flex items-start space-x-4">
-                        {/* Time and Importance */}
-                        <div className="flex-shrink-0">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {event.time ? formatTime(event.time) : 'N/A'}
-                            </span>
+                {/* Custom Date */}
+                {viewMode === 'custom' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Data
+                    </label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="input"
+                    />
+                  </div>
+                )}
+
+                {/* Filters Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      País
+                    </label>
+                    <select
+                      value={selectedCountry}
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      className="input"
+                    >
+                      {countries.map((country) => (
+                        <option key={country.value} value={country.value}>
+                          {country.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Importância
+                    </label>
+                    <select
+                      value={selectedImportance}
+                      onChange={(e) => setSelectedImportance(e.target.value)}
+                      className="input"
+                    >
+                      {importanceLevels.map((level) => (
+                        <option key={level.value} value={level.value}>
+                          {level.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Categoria
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="input"
+                    >
+                      {categories.map((category) => (
+                        <option key={category.value} value={category.value}>
+                          {category.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Investing.com Calendar Widget */}
+        {useInvestingWidget ? (
+          <div className="mb-8">
+            <div className="card dark:bg-gray-800 dark:border-gray-700 p-6">
+              <InvestingCalendarWidget 
+                theme={theme === 'dark' ? 'dark' : 'light'}
+                height={800} 
+                width="100%"
+                timeSpan="thisWeek"
+                showCountries={['BR', 'US', 'EU', 'GB', 'CN', 'JP']}
+                importanceLevel={3}
+                className="mb-4"
+              />
+            </div>
+          </div>
+        ) : (
+          /* Events */
+          Object.keys(groupedEvents).length > 0 ? (
+            <div className="space-y-8">
+              {Object.entries(groupedEvents).map(([date, dateEvents]) => (
+                <div key={date}>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Calendar className="h-6 w-6 text-primary-600" />
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      {formatDate(date)}
+                    </h2>
+                    <span className="badge-primary">
+                      {dateEvents.length} evento{dateEvents.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    {dateEvents.map((event, index) => (
+                      <div key={index} className="card dark:bg-gray-800 dark:border-gray-700 p-6 hover:shadow-card-hover transition-shadow">
+                        <div className="flex items-start space-x-4">
+                          {/* Time and Importance */}
+                          <div className="flex-shrink-0">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                {event.time ? formatTime(event.time) : 'N/A'}
+                              </span>
+                            </div>
+                            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
+                              getImportanceColor(event.importance)
+                            }`}>
+                              <span className="mr-1">{getImportanceIcon(event.importance)}</span>
+                              {event.importance === 'high' ? 'Alta' : 
+                               event.importance === 'medium' ? 'Média' : 'Baixa'}
+                            </div>
                           </div>
-                          <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
-                            getImportanceColor(event.importance)
-                          }`}>
-                            <span className="mr-1">{getImportanceIcon(event.importance)}</span>
-                            {event.importance === 'high' ? 'Alta' : 
-                             event.importance === 'medium' ? 'Média' : 'Baixa'}
-                          </div>
-                        </div>
 
                         {/* Event Details */}
                         <div className="flex-1">
@@ -398,7 +441,7 @@ const CalendarPage: React.FC = () => {
               </button>
             </div>
           </div>
-        )}
+        ))}
 
         {loading && events.length > 0 && (
           <div className="flex justify-center mt-8">
