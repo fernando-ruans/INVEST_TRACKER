@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, LogIn, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, LogIn, TrendingUp, PieChart, BarChart3, Globe, Shield, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
@@ -44,25 +44,112 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900">
-            <LogIn className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900">
+      {/* Seção de informações sobre o app */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 dark:from-primary-700 dark:to-primary-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black opacity-20"></div>
+        <div className="relative z-10 flex flex-col justify-center px-12 py-16 text-white">
+          {/* Logo */}
+          <div className="flex items-center mb-8">
+            <div className="h-12 w-12 bg-white rounded-lg flex items-center justify-center mr-4">
+              <TrendingUp className="h-8 w-8 text-primary-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">InvestTracker</h1>
+              <p className="text-primary-100 text-sm">Sua plataforma de investimentos</p>
+            </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Faça login em sua conta
+
+          {/* Título principal */}
+          <h2 className="text-4xl font-bold mb-6 leading-tight">
+            Gerencie seus investimentos
+            <br />
+            <span className="text-primary-200">de forma inteligente</span>
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Ou{' '}
-            <Link
-              to="/register"
-              className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
-            >
-              crie uma nova conta
-            </Link>
+
+          <p className="text-xl text-primary-100 mb-12 leading-relaxed">
+            Acompanhe seu portfólio, analise tendências do mercado e tome decisões informadas com nossa plataforma completa de investimentos.
           </p>
+
+          {/* Features */}
+          <div className="space-y-6">
+            <div className="flex items-center">
+              <div className="h-10 w-10 bg-primary-500 rounded-lg flex items-center justify-center mr-4">
+                <PieChart className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Análise de Portfólio</h3>
+                <p className="text-primary-100 text-sm">Visualize a distribuição e performance dos seus investimentos</p>
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <div className="h-10 w-10 bg-primary-500 rounded-lg flex items-center justify-center mr-4">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Relatórios Detalhados</h3>
+                <p className="text-primary-100 text-sm">Gráficos e métricas para acompanhar seu progresso</p>
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <div className="h-10 w-10 bg-primary-500 rounded-lg flex items-center justify-center mr-4">
+                <Globe className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Mercado em Tempo Real</h3>
+                <p className="text-primary-100 text-sm">Cotações atualizadas e notícias do mercado financeiro</p>
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <div className="h-10 w-10 bg-primary-500 rounded-lg flex items-center justify-center mr-4">
+                <Shield className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Segurança Garantida</h3>
+                <p className="text-primary-100 text-sm">Seus dados protegidos com criptografia de ponta</p>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Elementos decorativos */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-400 rounded-full opacity-10 transform translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary-300 rounded-full opacity-10 transform -translate-x-24 translate-y-24"></div>
+      </div>
+
+      {/* Seção de login */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-md w-full space-y-8">
+          {/* Logo mobile */}
+          <div className="lg:hidden text-center">
+            <div className="inline-flex items-center mb-6">
+              <div className="h-10 w-10 bg-primary-600 rounded-lg flex items-center justify-center mr-3">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-left">
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">InvestTracker</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-xs">Sua plataforma de investimentos</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+              Faça login em sua conta
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+              Ou{' '}
+              <Link
+                to="/register"
+                className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                crie uma nova conta
+              </Link>
+            </p>
+          </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
@@ -152,6 +239,7 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );
