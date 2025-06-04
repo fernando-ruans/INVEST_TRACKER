@@ -4,10 +4,13 @@ import { assetService, portfolioService, newsService, calendarService } from '..
 import { MarketOverview, Portfolio, NewsItem, EconomicEvent, DashboardStats } from '../types';
 import AssetSearch from './AssetSearch';
 import { AdvancedTradingViewChart } from './TradingViewChart';
+import InvestingCalendarWidget from './InvestingCalendarWidget';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Dashboard: React.FC = () => {
+  const { theme } = useTheme();
   const [marketOverview, setMarketOverview] = useState<MarketOverview | null>(null);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -616,28 +619,15 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="p-6">
-              {todayEvents.length > 0 ? (
-                <div className="space-y-3">
-                  {todayEvents.map((event) => (
-                    <div key={event.id} className="border-l-4 border-primary-400 pl-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">{event.title}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{event.country}</p>
-                        </div>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getImportanceColor(event.importance)}`}>
-                          {event.importance}
-                        </span>
-                      </div>
-                      {event.time && (
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{event.time}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum evento importante hoje.</p>
-              )}
+              <InvestingCalendarWidget 
+                theme={theme === 'dark' ? 'dark' : 'light'}
+                height={400} 
+                width="100%"
+                timeSpan="today"
+                showCountries={['BR', 'US', 'EU', 'GB', 'CN', 'JP']}
+                importanceLevel={3}
+                className="mb-4"
+              />
             </div>
           </div>
 
