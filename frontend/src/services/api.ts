@@ -192,11 +192,27 @@ export const portfolioService = {
   async getPortfolioAssets(portfolioId: number): Promise<PortfolioAsset[]> {
     try {
       console.log(`Fetching portfolio assets for ID: ${portfolioId}`);
-      const response: AxiosResponse<ApiResponse<PortfolioAsset[]>> = await api.get(
+      const response: AxiosResponse<ApiResponse<any[]>> = await api.get(
         `/portfolio/${portfolioId}/assets`
       );
       console.log('Portfolio assets response:', response.data);
-      return response.data.data;
+      
+      // Mapear dados do backend (snake_case) para frontend (camelCase)
+      const mappedAssets: PortfolioAsset[] = response.data.data.map((asset: any) => ({
+        id: asset.id,
+        portfolioId: asset.portfolio_id,
+        symbol: asset.symbol,
+        quantity: asset.quantity,
+        averagePrice: asset.average_price,
+        currentPrice: asset.current_price,
+        totalValue: asset.total_value,
+        gain: asset.profit_loss,
+        gainPercent: asset.profit_loss_percent,
+        addedAt: asset.created_at,
+        updatedAt: asset.updated_at
+      }));
+      
+      return mappedAssets;
     } catch (error) {
       console.error('Error fetching portfolio assets:', error);
       throw error;
@@ -221,11 +237,35 @@ export const portfolioService = {
   async getPortfolioPerformance(portfolioId: number): Promise<PortfolioPerformance> {
     try {
       console.log(`Fetching portfolio performance for ID: ${portfolioId}`);
-      const response: AxiosResponse<ApiResponse<PortfolioPerformance>> = await api.get(
+      const response: AxiosResponse<ApiResponse<any>> = await api.get(
         `/portfolio/${portfolioId}/performance`
       );
       console.log('Portfolio performance response:', response.data);
-      return response.data.data;
+      
+      // Mapear dados do backend (snake_case) para frontend (camelCase)
+      const backendData = response.data.data;
+      const mappedData: PortfolioPerformance = {
+        totalValue: backendData.total_value || 0,
+        totalInvested: backendData.total_cost || 0,
+        totalGain: backendData.total_gain_loss || 0,
+        totalGainPercent: backendData.total_gain_loss_percent || 0,
+        dayGain: backendData.day_gain || 0,
+        dayGainPercent: backendData.day_gain_percent || 0,
+        assetsPerformance: (backendData.assets_performance || []).map((asset: any) => ({
+          symbol: asset.symbol,
+          quantity: asset.quantity,
+          averagePrice: asset.average_price,
+          currentPrice: asset.current_price,
+          currentValue: asset.current_value,
+          gain: asset.gain_loss,
+          gainPercent: asset.gain_loss_percent,
+          dayGain: asset.day_gain || 0,
+          dayGainPercent: asset.day_gain_percent || 0,
+          weight: asset.weight || 0
+        }))
+      };
+      
+      return mappedData;
     } catch (error) {
       console.error('Error fetching portfolio performance:', error);
       throw error;
