@@ -27,13 +27,13 @@ export interface UserLogin {
 export interface UserUpdate {
   email?: string;
   username?: string;
-  fullName?: string;
+  full_name?: string;
   avatar?: string;
 }
 
 export interface UserPasswordUpdate {
-  currentPassword: string;
-  newPassword: string;
+  current_password: string;
+  new_password: string;
 }
 
 export interface AuthToken {

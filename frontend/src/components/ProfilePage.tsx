@@ -141,7 +141,13 @@ const ProfilePage: React.FC = () => {
 
       // Se temos mudanças no perfil, atualizar
       if (hasChanges) {
-        await updateUser(profileForm);
+        // Mapear os campos corretamente para o backend
+        const updateData = {
+          email: profileForm.email,
+          username: profileForm.username,
+          full_name: profileForm.fullName // Mapear fullName para full_name
+        };
+        await updateUser(updateData);
         setProfileSuccess('Perfil atualizado com sucesso');
       } else if (!avatarFile) {
         setProfileSuccess('Nenhuma alteração detectada');

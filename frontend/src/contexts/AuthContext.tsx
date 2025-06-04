@@ -10,7 +10,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   register: (email: string, username: string, password: string, fullName?: string) => Promise<void>;
-  updateUser: (data: { email?: string; username?: string; fullName?: string; avatar?: string }) => Promise<void>;
+  updateUser: (data: { email?: string; username?: string; full_name?: string; avatar?: string }) => Promise<void>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   uploadAvatar: (file: File) => Promise<void>;
   removeAvatar: () => Promise<void>;
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Função para atualizar dados do usuário
-  const updateUser = async (data: { email?: string; username?: string; fullName?: string; avatar?: string }) => {
+  const updateUser = async (data: { email?: string; username?: string; full_name?: string; avatar?: string }) => {
     setIsLoading(true);
     try {
       const updatedUser = await authService.updateUser(data);
@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updatePassword = async (currentPassword: string, newPassword: string) => {
     setIsLoading(true);
     try {
-      await authService.updatePassword({ currentPassword, newPassword });
+      await authService.updatePassword({ current_password: currentPassword, new_password: newPassword });
     } catch (error) {
       console.error('Erro ao atualizar senha:', error);
       throw error;
