@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from app.database.database import get_db
+from app.database.database import get_db, User
 from app.services.portfolio_service import PortfolioService
+from app.services.auth_service import get_current_active_user
 from app.models.schemas import (
     PortfolioCreate, PortfolioUpdate, PortfolioResponse,
     PortfolioAssetCreate, PortfolioAssetUpdate, PortfolioAssetResponse
@@ -13,25 +14,29 @@ router = APIRouter()
 @router.post("/", response_model=dict)
 async def create_portfolio(
     portfolio_data: PortfolioCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Cria um novo portfolio
     """
     try:
-        portfolio = PortfolioService.create_portfolio(db, portfolio_data)
+        portfolio = PortfolioService.create_portfolio(db, portfolio_data, current_user.id)
         portfolio_response = PortfolioResponse.from_orm(portfolio)
         return {"success": True, "data": portfolio_response.dict()}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=dict)
-async def get_portfolios(db: Session = Depends(get_db)):
+async def get_portfolios(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
     """
     Obtém todos os portfolios do usuário
     """
     try:
-        portfolios = PortfolioService.get_portfolios(db)
+        portfolios = PortfolioService.get_portfolios(db, current_user.id)
         portfolios_response = [PortfolioResponse.from_orm(p).dict() for p in portfolios]
         return {"success": True, "data": portfolios_response}
     except Exception as e:
@@ -40,13 +45,14 @@ async def get_portfolios(db: Session = Depends(get_db)):
 @router.get("/{portfolio_id}", response_model=dict)
 async def get_portfolio(
     portfolio_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Obtém um portfolio específico
     """
     try:
-        portfolio = PortfolioService.get_portfolio(db, portfolio_id)
+        portfolio = PortfolioService.get_portfolio(db, portfolio_id, current_user.id)
         if not portfolio:
             raise HTTPException(status_code=404, detail="Portfolio não encontrado")
         portfolio_response = PortfolioResponse.from_orm(portfolio)
@@ -60,13 +66,14 @@ async def get_portfolio(
 async def update_portfolio(
     portfolio_id: int,
     portfolio_data: PortfolioUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Atualiza um portfolio
     """
     try:
-        portfolio = PortfolioService.update_portfolio(db, portfolio_id, portfolio_data)
+        portfolio = PortfolioService.update_portfolio(db, portfolio_id, portfolio_data, current_user.id)
         if not portfolio:
             raise HTTPException(status_code=404, detail="Portfolio não encontrado")
         portfolio_response = PortfolioResponse.from_orm(portfolio)
@@ -79,13 +86,14 @@ async def update_portfolio(
 @router.delete("/{portfolio_id}", response_model=dict)
 async def delete_portfolio(
     portfolio_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Deleta um portfolio
     """
     try:
-        success = PortfolioService.delete_portfolio(db, portfolio_id)
+        success = PortfolioService.delete_portfolio(db, portfolio_id, current_user.id)
         if not success:
             raise HTTPException(status_code=404, detail="Portfolio não encontrado")
         return {"success": True, "message": "Portfolio deletado com sucesso"}
@@ -98,13 +106,14 @@ async def delete_portfolio(
 async def add_asset_to_portfolio(
     portfolio_id: int,
     asset_data: PortfolioAssetCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Adiciona um ativo ao portfolio
     """
     try:
-        asset = PortfolioService.add_asset_to_portfolio(db, portfolio_id, asset_data)
+        asset = PortfolioService.add_asset_to_portfolio(db, portfolio_id, asset_data, current_user.id)
         asset_response = PortfolioAssetResponse.from_orm(asset)
         return {"success": True, "data": asset_response.dict()}
     except Exception as e:
@@ -113,13 +122,14 @@ async def add_asset_to_portfolio(
 @router.get("/{portfolio_id}/assets", response_model=dict)
 async def get_portfolio_assets(
     portfolio_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Obtém todos os ativos de um portfolio
     """
     try:
-        assets = PortfolioService.get_portfolio_assets(db, portfolio_id)
+        assets = PortfolioService.get_portfolio_assets(db, portfolio_id, current_user.id)
         # Como agora o serviço retorna dicionários, não precisamos usar from_orm
         return {"success": True, "data": assets}
     except Exception as e:
@@ -129,13 +139,14 @@ async def get_portfolio_assets(
 async def update_portfolio_asset(
     asset_id: int,
     asset_data: PortfolioAssetUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Atualiza um ativo do portfolio
     """
     try:
-        asset = PortfolioService.update_portfolio_asset(db, asset_id, asset_data)
+        asset = PortfolioService.update_portfolio_asset(db, asset_id, asset_data, current_user.id)
         if not asset:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
         asset_response = PortfolioAssetResponse.from_orm(asset)
@@ -148,13 +159,14 @@ async def update_portfolio_asset(
 @router.delete("/assets/{asset_id}", response_model=dict)
 async def remove_asset_from_portfolio(
     asset_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Remove um ativo do portfolio
     """
     try:
-        success = PortfolioService.remove_asset_from_portfolio(db, asset_id, user_id=1)
+        success = PortfolioService.remove_asset_from_portfolio(db, asset_id, current_user.id)
         if not success:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
         return {"success": True, "message": "Ativo removido com sucesso"}
@@ -166,13 +178,14 @@ async def remove_asset_from_portfolio(
 @router.get("/{portfolio_id}/performance", response_model=dict)
 async def get_portfolio_performance(
     portfolio_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Calcula e retorna a performance de um portfolio
     """
     try:
-        performance = PortfolioService.calculate_portfolio_performance(db, portfolio_id)
+        performance = PortfolioService.calculate_portfolio_performance(db, portfolio_id, current_user.id)
         return {"success": True, "data": performance}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -180,22 +193,23 @@ async def get_portfolio_performance(
 @router.get("/{portfolio_id}/summary", response_model=dict)
 async def get_portfolio_summary(
     portfolio_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Obtém resumo completo do portfolio (informações + ativos + performance)
     """
     try:
         # Buscar informações do portfolio
-        portfolio = PortfolioService.get_portfolio(db, portfolio_id)
+        portfolio = PortfolioService.get_portfolio(db, portfolio_id, current_user.id)
         if not portfolio:
             raise HTTPException(status_code=404, detail="Portfolio não encontrado")
         
         # Buscar ativos
-        assets = PortfolioService.get_portfolio_assets(db, portfolio_id)
+        assets = PortfolioService.get_portfolio_assets(db, portfolio_id, current_user.id)
         
         # Calcular performance
-        performance = PortfolioService.calculate_portfolio_performance(db, portfolio_id)
+        performance = PortfolioService.calculate_portfolio_performance(db, portfolio_id, current_user.id)
         
         summary = {
             "portfolio": portfolio,
@@ -213,13 +227,14 @@ async def get_portfolio_summary(
 @router.get("/{portfolio_id}/allocation", response_model=dict)
 async def get_portfolio_allocation(
     portfolio_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Obtém alocação de ativos do portfolio (distribuição por ativo)
     """
     try:
-        performance = PortfolioService.calculate_portfolio_performance(db, portfolio_id)
+        performance = PortfolioService.calculate_portfolio_performance(db, portfolio_id, current_user.id)
         
         if not performance["assets_performance"]:
             return {"success": True, "data": []}
@@ -251,14 +266,15 @@ async def get_portfolio_allocation(
 async def suggest_portfolio_rebalance(
     portfolio_id: int,
     target_allocation: dict,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Sugere rebalanceamento do portfolio baseado na alocação alvo
     """
     try:
         # Obter alocação atual
-        current_allocation = await get_portfolio_allocation(portfolio_id, db)
+        current_allocation = await get_portfolio_allocation(portfolio_id, db, current_user)
         current_data = current_allocation["data"] if current_allocation["success"] else []
         
         # Calcular sugestões de rebalanceamento
