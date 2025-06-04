@@ -504,7 +504,7 @@ const Dashboard: React.FC = () => {
                           .map((index) => (
                             <div 
                               key={index.symbol} 
-                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                               onClick={() => {
                                 if (index.symbol && index.symbol.trim() !== '') {
                                   setSelectedSymbol(index.symbol);
@@ -512,11 +512,11 @@ const Dashboard: React.FC = () => {
                               }}
                             >
                               <div>
-                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
-                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{index.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{index.symbol}</p>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">
                                   {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
                                 </p>
                                 <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
@@ -532,14 +532,14 @@ const Dashboard: React.FC = () => {
                   {/* Europa */}
                    {marketOverview.indices.filter(index => ['DAX', 'UKX', 'CAC'].includes(index.symbol)).length > 0 && (
                      <div>
-                       <h4 className="text-sm font-semibold text-purple-600 mb-3 uppercase tracking-wide">EUROPA</h4>
+                       <h4 className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-3 uppercase tracking-wide">EUROPA</h4>
                        <div className="space-y-3">
                          {marketOverview.indices
                            .filter(index => ['DAX', 'UKX', 'CAC'].includes(index.symbol))
                           .map((index) => (
                             <div 
                               key={index.symbol} 
-                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                              className="flex justify-between items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                               onClick={() => {
                                 if (index.symbol && index.symbol.trim() !== '') {
                                   setSelectedSymbol(index.symbol);
@@ -547,11 +547,11 @@ const Dashboard: React.FC = () => {
                               }}
                             >
                               <div>
-                                <p className="text-sm font-medium text-gray-900">{index.name}</p>
-                                <p className="text-xs text-gray-500">{index.symbol}</p>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{index.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{index.symbol}</p>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">
                                   {index.price && index.price > 0 ? index.price.toLocaleString('pt-BR') : 'Carregando...'}
                                 </p>
                                 <p className={`text-xs ${getChangeColor(index.change || 0)}`}>
