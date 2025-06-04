@@ -71,16 +71,75 @@ INVEST_TRACKER/
 
 ## 🚀 Como Executar
 
-### Backend
+### Execução Rápida (Comando Único)
+
+**Para executar frontend e backend simultaneamente:**
+```bash
+# Instalar concurrently (apenas na primeira vez)
+npm install
+
+# Executar tudo com um comando
+npm start
+```
+
+**Ou use o script PowerShell (Windows):**
+```powershell
+.\start.ps1
+```
+
+### Build para Produção (Comando Único)
+
+**Para fazer build de tudo:**
+```bash
+npm run build
+```
+
+**Ou use o script PowerShell (Windows):**
+```powershell
+.\build.ps1
+```
+
+### Execução Manual (Separada)
+
+#### Backend (FastAPI)
+
+1. **Navegue para o diretório do backend:**
 ```bash
 cd backend
-pip install -r requirements.txt
-python -m uvicorn main:app --reload```
+```
 
-### Frontend
+2. **Instale as dependências:**
+```bash
+pip install -r requirements.txt
+```
+
+3. **Configure o banco de dados:**
+```bash
+python setup_database.py
+```
+
+4. **Execute o servidor:**
+```bash
+python -m uvicorn main:app --reload
+```
+
+O backend estará disponível em: http://localhost:8000
+Documentação da API: http://localhost:8000/docs
+
+#### Frontend (React)
+
+1. **Navegue para o diretório do frontend:**
 ```bash
 cd frontend
+```
+
+2. **Instale as dependências:**
+```bash
 npm install
+```
+
+3. **Execute o servidor de desenvolvimento:**
+```bash
 npm start
 ```
 
