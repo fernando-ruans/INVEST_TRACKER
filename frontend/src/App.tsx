@@ -65,12 +65,12 @@ const AuthenticatedApp: React.FC = () => {
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-gray-900">
         {/* Sidebar para mobile */}
-        <div className={`fixed inset-0 flex z-40 md:hidden ${sidebarOpen ? '' : 'hidden'}`}>
+        <div className={`fixed inset-0 flex z-40 lg:hidden ${sidebarOpen ? '' : 'hidden'}`}>
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800 shadow-xl">
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
-                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white hover:bg-gray-600 transition-colors"
                 onClick={() => setSidebarOpen(false)}
               >
                 <X className="h-6 w-6 text-white" />
@@ -81,8 +81,8 @@ const AuthenticatedApp: React.FC = () => {
         </div>
 
         {/* Sidebar para desktop */}
-        <div className="hidden md:flex md:flex-shrink-0">
-          <div className="flex flex-col w-64">
+        <div className="hidden lg:flex lg:flex-shrink-0">
+          <div className="flex flex-col w-64 border-r border-gray-200 dark:border-gray-700">
             <SidebarContent navigation={navigation} user={user} onLogout={handleLogout} />
           </div>
         </div>
@@ -90,34 +90,36 @@ const AuthenticatedApp: React.FC = () => {
         {/* Conteúdo principal */}
         <div className="flex flex-col w-0 flex-1 overflow-hidden">
           {/* Header mobile */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <div className="relative z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow">
               <button
-                className="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 md:hidden"
+                className="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 lg:hidden"
                 onClick={() => setSidebarOpen(true)}
+                aria-label="Abrir menu"
               >
                 <Menu className="h-6 w-6" />
               </button>
-              <div className="flex-1 px-4 flex justify-between">
-                <div className="flex-1 flex">
-                  <div className="w-full flex md:ml-0">
-                    <div className="relative w-full text-gray-400 dark:text-gray-300 focus-within:text-gray-600 dark:focus-within:text-gray-200">
-                      <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5" />
-                      </div>
-                      <input
-                        className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-300 focus:ring-0 focus:border-transparent bg-gray-100 dark:bg-gray-700"
-                        placeholder="Buscar ativos para o gráfico..."
-                        type="search"
-                      />
-                    </div>
-                  </div>
+              <div className="flex-1 px-2 sm:px-4 flex justify-between items-center">
+                <div className="flex-shrink-0 flex items-center">
+                  <img src="/logo.png" alt="InvestTracker" className="h-8 w-auto" />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <ThemeToggle />
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    aria-label="Sair"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
 
-          <main className="flex-1 relative overflow-y-auto focus:outline-none">
+          <main className="flex-1 relative overflow-y-auto focus:outline-none pb-safe">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/portfolio" element={<Portfolio />} />
@@ -143,10 +145,10 @@ const SidebarContent: React.FC<{
   onLogout: () => void; 
 }> = ({ navigation, user, onLogout }) => {
   return (
-    <div className="flex flex-col h-0 flex-1 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-      <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-        <div className="flex items-center flex-shrink-0 px-4">
-          <img src="/logo.png" alt="InvestTracker" className="h-32 w-auto" />
+    <div className="flex flex-col h-0 flex-1 bg-white dark:bg-gray-800">
+      <div className="flex-1 flex flex-col pt-3 sm:pt-5 pb-4 overflow-y-auto">
+        <div className="flex items-center justify-center flex-shrink-0 px-4 mb-2 sm:mb-4">
+          <img src="/logo.png" alt="InvestTracker" className="h-16 sm:h-24 lg:h-32 w-auto" />
         </div>
         <nav className="mt-5 flex-1 px-2 bg-white dark:bg-gray-800 space-y-1">
           {navigation.map((item) => {

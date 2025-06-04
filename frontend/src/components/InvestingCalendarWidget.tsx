@@ -1,5 +1,27 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+
+// Hook para detectar o tamanho da tela
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowSize;
+};
 
 interface InvestingCalendarWidgetProps {
   width?: string | number;
@@ -14,7 +36,7 @@ interface InvestingCalendarWidgetProps {
 
 const InvestingCalendarWidget: React.FC<InvestingCalendarWidgetProps> = ({
   width = '100%',
-  height = 800,
+  height,
   theme,
   timeZone = 'America/Sao_Paulo',
   timeSpan = 'thisWeek',
@@ -24,6 +46,12 @@ const InvestingCalendarWidget: React.FC<InvestingCalendarWidgetProps> = ({
 }) => {
   const { theme: contextTheme } = useTheme();
   const currentTheme = theme || contextTheme;
+  const { width: screenWidth } = useWindowSize();
+  
+  // Calcula a altura responsiva se não for fornecida
+  const responsiveHeight = height || (screenWidth < 640 ? 400 : 
+                                     screenWidth < 768 ? 500 : 
+                                     screenWidth < 1024 ? 600 : 800);
   
   // URL do widget econômico do TradingView
   // Usando o widget oficial em vez do iframe direto para evitar problemas de X-Frame-Options
@@ -91,10 +119,10 @@ const InvestingCalendarWidget: React.FC<InvestingCalendarWidgetProps> = ({
         className="investing-calendar-widget"
         style={{
           width: typeof width === 'number' ? `${width}px` : width,
-          height: typeof height === 'number' ? `${height}px` : height,
+          height: typeof responsiveHeight === 'number' ? `${responsiveHeight}px` : responsiveHeight,
           background: contextTheme === 'dark' ? '#1f2937' : '#fff',
           borderRadius: 8,
-          minHeight: 600,
+          minHeight: screenWidth < 640 ? 300 : 400,
           overflow: 'hidden',
         }}
       />

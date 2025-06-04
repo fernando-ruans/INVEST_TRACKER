@@ -621,11 +621,12 @@ const Dashboard: React.FC = () => {
             <div className="p-6">
               <InvestingCalendarWidget 
                 theme={theme === 'dark' ? 'dark' : 'light'}
-                height={1000} 
+                height={window.innerWidth < 768 ? 500 : window.innerWidth < 1024 ? 700 : 1000} 
                 width="100%"
                 timeSpan="today"
                 showCountries={['BR', 'US', 'EU', 'GB', 'CN', 'JP']}
                 importanceLevel={3}
+                className="responsive-calendar"
               />
             </div>
           </div>

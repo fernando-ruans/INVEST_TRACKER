@@ -247,15 +247,175 @@
 /* Responsividade para dispositivos móveis */
 @media (max-width: 640px) {
   .card {
-    @apply rounded-none border-l-0 border-r-0;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    margin-left: 0;
+    margin-right: 0;
   }
   
   .card:first-child {
-    @apply border-t-0;
+    border-top: 0;
   }
   
   .card:last-child {
-    @apply border-b-0;
+    border-bottom: 0;
+  }
+
+  /* Ajustes para botões em mobile */
+  .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Ajustes para inputs em mobile */
+  .input {
+    font-size: 1rem; /* Evita zoom no iOS */
+  }
+
+  /* Grid responsivo */
+  .responsive-grid-1 {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Espaçamentos reduzidos */
+  .p-6 {
+    padding: 1rem;
+  }
+
+  .px-6 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .py-6 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Texto menor em mobile */
+  .text-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .text-xl {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  .text-2xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .text-3xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  /* Tabelas responsivas */
+  .table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 100%;
+  }
+
+  /* Widgets TradingView responsivos */
+  .tradingview-widget-container {
+    min-height: 300px;
+  }
+
+  /* Sidebar mobile */
+  .sidebar-mobile {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+  }
+
+  /* Charts responsivos */
+  .recharts-wrapper {
+    min-height: 250px;
+  }
+}
+
+/* Tablet breakpoint */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .responsive-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .responsive-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Ajustes para tablet */
+  .card {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .tradingview-widget-container {
+    min-height: 400px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 896px) and (orientation: landscape) {
+  .min-h-screen {
+    min-height: 100vh;
+  }
+
+  /* Reduzir altura de componentes em landscape */
+  .tradingview-widget-container {
+    min-height: 250px;
+  }
+
+  .recharts-wrapper {
+    min-height: 200px;
+  }
+}
+
+/* Touch targets maiores para mobile */
+@media (max-width: 640px) {
+  button, .btn, a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Melhor espaçamento para touch */
+  .space-y-2 > * + * {
+    margin-top: 0.75rem;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 1.5rem;
   }
 }
 
