@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Key, Save, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Lock, Upload, X, Camera, Edit3, Save, Key } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const ProfilePage: React.FC = () => {
-  const { user, updateUser, updatePassword, logout } = useAuth();
+  const { user, updateUser, updatePassword, logout, uploadAvatar, removeAvatar } = useAuth();
   const navigate = useNavigate();
 
   // Estado para o formulário de perfil
@@ -13,6 +13,23 @@ const ProfilePage: React.FC = () => {
     username: user?.username || '',
     fullName: user?.fullName || ''
   });
+
+  // Estado para o avatar
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar || null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Atualizar o formulário quando o usuário mudar
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        email: user.email || '',
+        username: user.username || '',
+        fullName: user.fullName || ''
+      });
+      setAvatarPreview(user.avatar || null);
+    }
+  }, [user]);
 
   // Estado para o formulário de senha
   const [passwordForm, setPasswordForm] = useState({
@@ -53,6 +70,56 @@ const ProfilePage: React.FC = () => {
     if (passwordSuccess) setPasswordSuccess('');
   };
 
+  // Manipulador para seleção de arquivo de avatar
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Manipulador para remover avatar
+  const handleRemoveAvatar = async () => {
+    try {
+      setIsProfileLoading(true);
+      await removeAvatar();
+      setAvatarPreview(null);
+      setAvatarFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      setProfileSuccess('Avatar removido com sucesso');
+    } catch (err: any) {
+      setProfileError(err.message || 'Erro ao remover avatar');
+    } finally {
+      setIsProfileLoading(false);
+    }
+  };
+
+  // Manipulador para upload de avatar
+  const handleUploadAvatar = async () => {
+    if (!avatarFile) return;
+    
+    try {
+      setIsProfileLoading(true);
+      await uploadAvatar(avatarFile);
+      setAvatarFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      setProfileSuccess('Avatar atualizado com sucesso');
+    } catch (err: any) {
+      setProfileError(err.message || 'Erro ao fazer upload do avatar');
+    } finally {
+      setIsProfileLoading(false);
+    }
+  };
+
   // Validação e envio do formulário de perfil
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,19 +134,18 @@ const ProfilePage: React.FC = () => {
         profileForm.username !== user?.username ||
         profileForm.fullName !== user?.fullName;
 
-      if (!hasChanges) {
-        setProfileSuccess('Nenhuma alteração detectada');
-        setIsProfileLoading(false);
-        return;
+      // Se temos um novo arquivo de avatar, fazer upload primeiro
+      if (avatarFile) {
+        await handleUploadAvatar();
       }
 
-      await updateUser({
-        email: profileForm.email !== user?.email ? profileForm.email : undefined,
-        username: profileForm.username !== user?.username ? profileForm.username : undefined,
-        fullName: profileForm.fullName !== user?.fullName ? profileForm.fullName : undefined
-      });
-
-      setProfileSuccess('Perfil atualizado com sucesso');
+      // Se temos mudanças no perfil, atualizar
+      if (hasChanges) {
+        await updateUser(profileForm);
+        setProfileSuccess('Perfil atualizado com sucesso');
+      } else if (!avatarFile) {
+        setProfileSuccess('Nenhuma alteração detectada');
+      }
     } catch (err: any) {
       setProfileError(err.message || 'Erro ao atualizar perfil');
     } finally {
@@ -144,6 +210,51 @@ const ProfilePage: React.FC = () => {
           <div className="px-4 py-5 sm:p-6">
             <form onSubmit={handleProfileSubmit}>
               <div className="space-y-6">
+                {/* Avatar Upload Section */}
+                <div className="flex flex-col items-center mb-6">
+                  <div className="relative">
+                    {avatarPreview ? (
+                      <div className="relative">
+                        <img 
+                          src={avatarPreview} 
+                          alt="Avatar do usuário" 
+                          className="h-32 w-32 rounded-full object-cover border-4 border-primary-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleRemoveAvatar}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="h-32 w-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <User className="h-16 w-16 text-gray-400" />
+                      </div>
+                    )}
+                    
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute bottom-0 right-0 bg-primary-500 text-white rounded-full p-2 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      <Camera className="h-5 w-5" />
+                    </button>
+                  </div>
+                  
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleAvatarChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Clique para alterar seu avatar
+                  </p>
+                </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email
@@ -170,7 +281,7 @@ const ProfilePage: React.FC = () => {
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
@@ -226,7 +337,7 @@ const ProfilePage: React.FC = () => {
                     {isProfileLoading ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     ) : (
-                      <Save className="h-5 w-5 mr-2" />
+                      <Edit3 className="w-5 h-5" />
                     )}
                     Salvar alterações
                   </button>
@@ -251,7 +362,7 @@ const ProfilePage: React.FC = () => {
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Key className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type={showCurrentPassword ? 'text' : 'password'}
@@ -285,7 +396,7 @@ const ProfilePage: React.FC = () => {
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Key className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type={showNewPassword ? 'text' : 'password'}
@@ -319,7 +430,7 @@ const ProfilePage: React.FC = () => {
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Key className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -372,7 +483,7 @@ const ProfilePage: React.FC = () => {
                     {isPasswordLoading ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     ) : (
-                      <Key className="h-5 w-5 mr-2" />
+                      <Lock className="w-5 h-5 mr-2" />
                     )}
                     Alterar senha
                   </button>

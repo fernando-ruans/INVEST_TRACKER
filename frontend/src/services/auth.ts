@@ -88,6 +88,25 @@ export const authService = {
     return response.data;
   },
 
+  // Upload de avatar do usuário
+  async uploadAvatar(file: File): Promise<User> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    const response: AxiosResponse<User> = await api.post('/auth/me/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Remover avatar do usuário
+  async removeAvatar(): Promise<User> {
+    const response: AxiosResponse<User> = await api.delete('/auth/me/avatar');
+    return response.data;
+  },
+
   // Atualizar senha do usuário
   async updatePassword(passwordData: UserPasswordUpdate): Promise<{ message: string }> {
     const response: AxiosResponse<{ message: string }> = await api.put('/auth/me/password', passwordData);

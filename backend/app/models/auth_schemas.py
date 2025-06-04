@@ -22,6 +22,7 @@ class UserUpdatePassword(BaseModel):
 
 class UserResponse(UserBase):
     id: int
+    avatar: Optional[str] = None
     is_active: bool
     is_verified: bool
     created_at: datetime

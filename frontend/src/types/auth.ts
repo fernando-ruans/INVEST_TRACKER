@@ -5,6 +5,7 @@ export interface User {
   email: string;
   username: string;
   fullName?: string;
+  avatar?: string;
   isActive: boolean;
   isVerified: boolean;
   createdAt: string;
@@ -27,6 +28,7 @@ export interface UserUpdate {
   email?: string;
   username?: string;
   fullName?: string;
+  avatar?: string;
 }
 
 export interface UserPasswordUpdate {

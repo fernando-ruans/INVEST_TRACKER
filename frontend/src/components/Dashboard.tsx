@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, Activity, Calendar, Newspaper, AlertCircle, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Activity, Calendar, Newspaper, AlertCircle, RefreshCw, User } from 'lucide-react';
 import { assetService, portfolioService, newsService, calendarService } from '../services/api';
 import { MarketOverview, Portfolio, NewsItem, EconomicEvent, DashboardStats } from '../types';
 import AssetSearch from './AssetSearch';
@@ -8,9 +8,11 @@ import InvestingCalendarWidget from './InvestingCalendarWidget';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard: React.FC = () => {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const [marketOverview, setMarketOverview] = useState<MarketOverview | null>(null);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -349,6 +351,47 @@ const Dashboard: React.FC = () => {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        {user && (
+          <div className="bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700 rounded-lg shadow-lg mb-8 overflow-hidden">
+            <div className="px-6 py-8">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.fullName || user.username}
+                      className="h-16 w-16 rounded-full border-4 border-white shadow-lg object-cover"
+                    />
+                  ) : (
+                    <div className="h-16 w-16 rounded-full bg-white/20 border-4 border-white shadow-lg flex items-center justify-center">
+                      <User className="h-8 w-8 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-white">
+                    Bem-vindo de volta, {user.fullName || user.username}!
+                  </h2>
+                  <p className="text-primary-100 mt-1">
+                    Aqui está um resumo dos seus investimentos hoje
+                  </p>
+                </div>
+                <div className="hidden md:block">
+                  <div className="text-right">
+                    <p className="text-primary-100 text-sm">
+                      {format(new Date(), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                    </p>
+                    <p className="text-white font-medium">
+                      {format(new Date(), 'HH:mm')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats Cards */}
         {dashboardStats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

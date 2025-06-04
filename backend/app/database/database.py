@@ -25,6 +25,7 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     full_name = Column(String)
     hashed_password = Column(String)
+    avatar = Column(String, nullable=True)  # URL or path to avatar image
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)

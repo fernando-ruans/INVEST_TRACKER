@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import List
+import os
+import uuid
+from pathlib import Path
 
 from app.database.database import User
 from app.models.auth_schemas import (
@@ -187,3 +190,77 @@ async def update_password(password_update: UserUpdatePassword, db: Session = Dep
     db.commit()
     
     return {"message": "Senha atualizada com sucesso"}
+
+# Endpoint para upload de avatar
+@router.post("/me/avatar", response_model=UserResponse)
+async def upload_avatar(avatar: UploadFile = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    # Verificar se o arquivo é uma imagem
+    if not avatar.content_type or not avatar.content_type.startswith('image/'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Arquivo deve ser uma imagem"
+        )
+    
+    # Verificar tamanho do arquivo (máximo 5MB)
+    if avatar.size and avatar.size > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Arquivo muito grande. Máximo 5MB"
+        )
+    
+    try:
+        # Criar diretório de uploads se não existir
+        upload_dir = Path("uploads/avatars")
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Gerar nome único para o arquivo
+        file_extension = Path(avatar.filename or "").suffix
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = upload_dir / unique_filename
+        
+        # Salvar arquivo
+        with open(file_path, "wb") as buffer:
+            content = await avatar.read()
+            buffer.write(content)
+        
+        # Remover avatar anterior se existir
+        if current_user.avatar:
+            old_file_path = Path(current_user.avatar)
+            if old_file_path.exists():
+                old_file_path.unlink()
+        
+        # Atualizar usuário com novo avatar
+        current_user.avatar = str(file_path)
+        db.commit()
+        db.refresh(current_user)
+        
+        return current_user
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao fazer upload do avatar: {str(e)}"
+        )
+
+# Endpoint para remover avatar
+@router.delete("/me/avatar", response_model=UserResponse)
+async def remove_avatar(db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    try:
+        # Remover arquivo do avatar se existir
+        if current_user.avatar:
+            file_path = Path(current_user.avatar)
+            if file_path.exists():
+                file_path.unlink()
+        
+        # Remover avatar do usuário
+        current_user.avatar = None
+        db.commit()
+        db.refresh(current_user)
+        
+        return current_user
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao remover avatar: {str(e)}"
+        )

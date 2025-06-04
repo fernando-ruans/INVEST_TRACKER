@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 import os
 import secrets
+from pathlib import Path
 
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -36,6 +38,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Criar diretório de uploads se não existir
+uploads_dir = Path("uploads")
+uploads_dir.mkdir(exist_ok=True)
+
+# Servir arquivos estáticos (avatars)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Incluir rotas
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])

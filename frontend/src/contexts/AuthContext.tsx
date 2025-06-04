@@ -10,8 +10,10 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   register: (email: string, username: string, password: string, fullName?: string) => Promise<void>;
-  updateUser: (data: { email?: string; username?: string; fullName?: string }) => Promise<void>;
+  updateUser: (data: { email?: string; username?: string; fullName?: string; avatar?: string }) => Promise<void>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  uploadAvatar: (file: File) => Promise<void>;
+  removeAvatar: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -77,13 +79,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Função para atualizar dados do usuário
-  const updateUser = async (data: { email?: string; username?: string; fullName?: string }) => {
+  const updateUser = async (data: { email?: string; username?: string; fullName?: string; avatar?: string }) => {
     setIsLoading(true);
     try {
       const updatedUser = await authService.updateUser(data);
       setUser(updatedUser);
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Função para upload de avatar
+  const uploadAvatar = async (file: File) => {
+    setIsLoading(true);
+    try {
+      const updatedUser = await authService.uploadAvatar(file);
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Erro ao fazer upload do avatar:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Função para remover avatar
+  const removeAvatar = async () => {
+    setIsLoading(true);
+    try {
+      const updatedUser = await authService.removeAvatar();
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Erro ao remover avatar:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -114,6 +144,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         updateUser,
         updatePassword,
+        uploadAvatar,
+        removeAvatar,
       }}
     >
       {children}
