@@ -27,7 +27,7 @@ const ProfilePage: React.FC = () => {
         username: user.username || '',
         fullName: user.fullName || ''
       });
-      setAvatarPreview(user.avatar || null);
+      setAvatarPreview(user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/uploads/avatars/${user.avatar.split('/').pop()}`) : null);
     }
   }, [user]);
 

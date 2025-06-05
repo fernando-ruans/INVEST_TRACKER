@@ -28,10 +28,10 @@ export const authService = {
   async login(credentials: UserLogin): Promise<AuthToken> {
     const response: AxiosResponse<any> = await api.post('/auth/login', credentials);
     
-    // O backend retorna access_token e token_type, mas o frontend espera accessToken e tokenType
+    // O backend retorna access_token e token_type dentro de data, mas o frontend espera accessToken e tokenType
     const authToken: AuthToken = {
-      accessToken: response.data.access_token,
-      tokenType: response.data.token_type
+      accessToken: response.data.data.access_token,
+      tokenType: response.data.data.token_type
     };
     
     // Salvar token no localStorage
@@ -78,14 +78,14 @@ export const authService = {
 
   // Obter dados do usuário atual
   async getCurrentUser(): Promise<User> {
-    const response: AxiosResponse<User> = await api.get('/auth/me');
-    return response.data;
+    const response: AxiosResponse<any> = await api.get('/auth/me');
+    return response.data.data;
   },
 
   // Atualizar dados do usuário
   async updateUser(userData: UserUpdate): Promise<User> {
-    const response: AxiosResponse<User> = await api.put('/auth/me', userData);
-    return response.data;
+    const response: AxiosResponse<any> = await api.put('/auth/profile', userData);
+    return response.data.data;
   },
 
   // Upload de avatar do usuário
@@ -93,23 +93,23 @@ export const authService = {
     const formData = new FormData();
     formData.append('avatar', file);
     
-    const response: AxiosResponse<User> = await api.post('/auth/me/avatar', formData, {
+    const response: AxiosResponse<any> = await api.post('/auth/avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    return response.data.data;
   },
 
   // Remover avatar do usuário
   async removeAvatar(): Promise<User> {
-    const response: AxiosResponse<User> = await api.delete('/auth/me/avatar');
-    return response.data;
+    const response: AxiosResponse<any> = await api.delete('/auth/avatar');
+    return response.data.data;
   },
 
   // Atualizar senha do usuário
   async updatePassword(passwordData: UserPasswordUpdate): Promise<{ message: string }> {
-    const response: AxiosResponse<{ message: string }> = await api.put('/auth/me/password', passwordData);
+    const response: AxiosResponse<any> = await api.put('/auth/password', passwordData);
     return response.data;
   },
 

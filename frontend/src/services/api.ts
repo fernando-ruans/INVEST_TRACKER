@@ -64,15 +64,15 @@ export const assetService = {
     const mappedData: AssetInfo = {
       symbol: backendData.symbol,
       name: backendData.name,
-      price: backendData.current_price || 0,
+      price: backendData.price || backendData.current_price || 0,
       change: backendData.change || 0,
-      changePercent: backendData.change_percent || 0,
+      changePercent: backendData.changePercent || backendData.change_percent || 0,
       volume: backendData.volume,
-      marketCap: backendData.market_cap,
-      peRatio: backendData.pe_ratio,
-      dividendYield: backendData.dividend_yield,
-      fiftyTwoWeekHigh: backendData.fifty_two_week_high || 0,
-      fiftyTwoWeekLow: backendData.fifty_two_week_low || 0,
+      marketCap: backendData.marketCap || backendData.market_cap,
+      peRatio: backendData.peRatio || backendData.pe_ratio,
+      dividendYield: backendData.dividendYield || backendData.dividend_yield,
+      fiftyTwoWeekHigh: backendData.fiftyTwoWeekHigh || backendData.fifty_two_week_high || 0,
+      fiftyTwoWeekLow: backendData.fiftyTwoWeekLow || backendData.fifty_two_week_low || 0,
       currency: backendData.currency || 'USD',
       exchange: backendData.exchange || '',
       sector: backendData.sector,
@@ -199,20 +199,20 @@ export const portfolioService = {
       );
       console.log('Portfolio assets response:', response.data);
       
-      // Mapear dados do backend (snake_case) para frontend (camelCase)
+      // Mapear dados do backend (já em camelCase) para frontend
       const mappedAssets: PortfolioAsset[] = response.data.data.map((asset: any) => ({
         id: asset.id,
-        portfolioId: asset.portfolio_id,
+        portfolioId: asset.portfolioId,
         symbol: asset.symbol,
         quantity: asset.quantity,
-        averagePrice: asset.average_price,
-        currentPrice: asset.current_price,
-        totalValue: asset.total_value,
-        gain: asset.profit_loss,
-        gainPercent: asset.profit_loss_percent,
-        addedAt: asset.created_at,
-        updatedAt: asset.updated_at
-      }));
+        averagePrice: asset.averagePrice,
+        currentPrice: asset.currentPrice,
+        totalValue: asset.totalValue,
+        gain: asset.gain,
+        gainPercent: asset.gainPercent,
+        addedAt: asset.addedAt,
+         updatedAt: asset.updatedAt
+       }));
       
       return mappedAssets;
     } catch (error) {
@@ -231,8 +231,8 @@ export const portfolioService = {
   },
 
   // Remover ativo do portfolio
-  async removeAssetFromPortfolio(assetId: number): Promise<void> {
-    await api.delete(`/portfolio/assets/${assetId}`);
+  async removeAssetFromPortfolio(portfolioId: number, assetId: number): Promise<void> {
+    await api.delete(`/portfolio/${portfolioId}/assets/${assetId}`);
   },
 
   // Obter performance do portfolio
@@ -249,10 +249,10 @@ export const portfolioService = {
       const mappedData: PortfolioPerformance = {
         totalValue: backendData.total_value || 0,
         totalInvested: backendData.total_cost || 0,
-        totalGain: backendData.total_gain_loss || 0,
-        totalGainPercent: backendData.total_gain_loss_percent || 0,
-        dayGain: backendData.day_gain || 0,
-        dayGainPercent: backendData.day_gain_percent || 0,
+        totalGain: backendData.total_profit_loss || 0,
+        totalGainPercent: backendData.total_profit_loss_percent || 0,
+        dayGain: backendData.daily_change || 0,
+        dayGainPercent: backendData.daily_change_percent || 0,
         assetsPerformance: (backendData.assets_performance || []).map((asset: any) => ({
           symbol: asset.symbol,
           quantity: asset.quantity,
@@ -352,7 +352,7 @@ export const newsService = {
   // Buscar notícias
   async searchNews(query: string, limit: number = 15): Promise<NewsItem[]> {
     const response: AxiosResponse<ApiResponse<any[]>> = await api.get(
-      `/news/search?query=${encodeURIComponent(query)}&limit=${limit}`
+      `/news/search?q=${encodeURIComponent(query)}&limit=${limit}`
     );
     return response.data.data.map(mapNewsItem);
   },
@@ -371,7 +371,7 @@ export const newsService = {
 
   // Obter manchetes
   async getHeadlines(limit: number = 5): Promise<NewsItem[]> {
-    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(`/news/headlines?limit=${limit}`);
+    const response: AxiosResponse<ApiResponse<any[]>> = await api.get(`/news?limit=${limit}`);
     return response.data.data.map(mapNewsItem);
   },
 };

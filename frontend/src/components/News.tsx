@@ -12,11 +12,10 @@ const News: React.FC = () => {
 
   const categories = [
     { id: 'all', name: 'Todas as Notícias', icon: '📰' },
-    { id: 'financial', name: 'Financeiro', icon: '💰' },
-    { id: 'stocks', name: 'Ações', icon: '📈' },
-    { id: 'crypto', name: 'Crypto', icon: '₿' },
-    { id: 'forex', name: 'Forex', icon: '💱' },
-    { id: 'commodities', name: 'Commodities', icon: '🛢️' },
+    { id: 'general', name: 'Geral', icon: '📄' },
+    { id: 'stocks', name: 'Ações & Mercados', icon: '📈' },
+    { id: 'crypto', name: 'Criptomoedas', icon: '₿' },
+    { id: 'technology', name: 'Tecnologia', icon: '💻' },
     { id: 'economy', name: 'Economia', icon: '🏭' }
   ];
 
@@ -65,12 +64,20 @@ const News: React.FC = () => {
   const handleCategoryChange = async (category: string) => {
     setSelectedCategory(category);
     
-    // Se não temos notícias carregadas, carregamos todas
-    if (news.length === 0) {
-      await loadNews();
+    try {
+      setLoading(true);
+      let data;
+      if (category === 'all') {
+        data = await newsService.getFinancialNews();
+      } else {
+        data = await newsService.getFinancialNews(20, category);
+      }
+      setNews(data);
+    } catch (error) {
+      console.error('Erro ao carregar notícias por categoria:', error);
+    } finally {
+      setLoading(false);
     }
-    
-    // O filtro será aplicado automaticamente no render através do .filter()
   };
 
   const formatDate = (dateString: string): string => {
@@ -176,7 +183,7 @@ const News: React.FC = () => {
             {categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
+                onClick={() => handleCategoryChange(category.id)}
                 className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                   selectedCategory === category.id
                     ? 'bg-primary-600 text-white'
@@ -193,12 +200,7 @@ const News: React.FC = () => {
         {/* Lista de Notícias */}
         {news.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {news
-              .filter(article => {
-                if (selectedCategory === 'all') return true;
-                return article.category === selectedCategory;
-              })
-              .map((article, index) => (
+            {news.map((article, index) => (
                 <NewsCard key={index} article={article} formatDate={formatDate} truncateText={truncateText} />
               ))}
           </div>

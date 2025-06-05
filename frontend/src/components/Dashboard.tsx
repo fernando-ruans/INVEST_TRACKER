@@ -359,7 +359,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex-shrink-0">
                   {user.avatar ? (
                     <img
-                      src={user.avatar}
+                      src={user.avatar?.startsWith('http') ? user.avatar : `http://localhost:8000/uploads/avatars/${user.avatar.split('/').pop()}`}
                       alt={user.fullName || user.username}
                       className="h-16 w-16 rounded-full border-4 border-white shadow-lg object-cover"
                     />

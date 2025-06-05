@@ -182,7 +182,7 @@ const SidebarContent: React.FC<{
             <div className="flex-shrink-0">
               {user?.avatar ? (
                 <img 
-                  src={user.avatar} 
+                  src={user.avatar?.startsWith('http') ? user.avatar : `http://localhost:8000/uploads/avatars/${user.avatar.split('/').pop()}`} 
                   alt="Avatar do usuário" 
                   className="h-8 w-8 rounded-full object-cover border-2 border-primary-500"
                 />

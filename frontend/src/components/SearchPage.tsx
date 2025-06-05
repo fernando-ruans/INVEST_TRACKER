@@ -16,27 +16,85 @@ const SearchPage: React.FC = () => {
 
   const filters = [
     { value: 'all', label: 'Todos' },
-    { value: 'stocks', label: 'Ações' },
-    { value: 'crypto', label: 'Criptomoedas' },
-    { value: 'forex', label: 'Forex' },
-    { value: 'commodities', label: 'Commodities' },
-    { value: 'b3', label: 'B3' },
-    { value: 'bmf', label: 'BMF' },
+    { value: 'equity', label: 'Ações' },
+    { value: 'etf', label: 'ETFs' },
+    { value: 'cryptocurrency', label: 'Criptomoedas' },
+    { value: 'currency', label: 'Forex' },
+    { value: 'commodity', label: 'Commodities' },
+    { value: 'index', label: 'Índices' },
+    { value: 'mutualfund', label: 'Fundos' },
   ];
 
+  // Função para normalizar tipos de ativos
+  const normalizeAssetType = (type: string): string => {
+    if (!type) return 'unknown';
+    const normalizedType = type.toLowerCase();
+    
+    // Mapeamento dos tipos do Yahoo Finance para tipos padronizados
+    const typeMapping: { [key: string]: string } = {
+      'equity': 'equity',
+      'stock': 'equity',
+      'etf': 'etf',
+      'cryptocurrency': 'cryptocurrency',
+      'currency': 'currency',
+      'forex': 'currency',
+      'commodity': 'commodity',
+      'index': 'index',
+      'mutualfund': 'mutualfund',
+      'fund': 'mutualfund'
+    };
+    
+    return typeMapping[normalizedType] || normalizedType;
+  };
+
+  // Função para determinar se um ativo é brasileiro
+  const isBrazilianAsset = (result: AssetSearchResult): boolean => {
+    const symbol = result.symbol?.toUpperCase() || '';
+    const exchange = result.exchange?.toUpperCase() || '';
+    
+    // Verifica se é da B3 ou BMF
+    if (exchange.includes('B3') || exchange.includes('BMF') || exchange.includes('SAO')) {
+      return true;
+    }
+    
+    // Verifica se o símbolo termina com .SA (ações brasileiras)
+    if (symbol.endsWith('.SA')) {
+      return true;
+    }
+    
+    return false;
+  };
+
   // Filtered search results
-  // Atualiza os resultados filtrados sempre que searchResults ou selectedFilter mudarem
   const filteredSearchResults = React.useMemo(() => {
     if (selectedFilter === 'all') return searchResults;
+    
     return searchResults.filter((result) => {
-      const type = result.type ? result.type.toLowerCase() : '';
-      const exchange = result.exchange ? result.exchange.toUpperCase() : '';
-      if (selectedFilter === 'stocks') return type === 'stock' || type === 'etf';
-      if (selectedFilter === 'crypto') return type === 'crypto';
-      if (selectedFilter === 'forex') return type === 'forex';
-      if (selectedFilter === 'commodities') return type === 'commodity';
-      if (selectedFilter === 'b3') return exchange === 'B3';
-      if (selectedFilter === 'bmf') return exchange === 'BMF';
+      const normalizedType = normalizeAssetType(result.type);
+      
+      // Filtros por tipo de ativo
+      if (selectedFilter === 'equity') {
+        return normalizedType === 'equity';
+      }
+      if (selectedFilter === 'etf') {
+        return normalizedType === 'etf';
+      }
+      if (selectedFilter === 'cryptocurrency') {
+        return normalizedType === 'cryptocurrency';
+      }
+      if (selectedFilter === 'currency') {
+        return normalizedType === 'currency';
+      }
+      if (selectedFilter === 'commodity') {
+        return normalizedType === 'commodity';
+      }
+      if (selectedFilter === 'index') {
+        return normalizedType === 'index';
+      }
+      if (selectedFilter === 'mutualfund') {
+        return normalizedType === 'mutualfund';
+      }
+      
       return false;
     });
   }, [searchResults, selectedFilter]);
@@ -69,6 +127,7 @@ const SearchPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await assetService.searchAssets(searchTerm, 20);
+      console.log('Search results:', data); // Debug log
       setSearchResults(data);
     } catch (error) {
       console.error('Erro ao buscar ativos:', error);
@@ -92,7 +151,37 @@ const SearchPage: React.FC = () => {
     }
   };
 
-  
+  // Função para obter a cor do badge baseada no tipo
+  const getBadgeColor = (type: string): string => {
+    const normalizedType = normalizeAssetType(type);
+    const colorMap: { [key: string]: string } = {
+      'equity': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+      'etf': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      'cryptocurrency': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+      'currency': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+      'commodity': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+      'index': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+      'mutualfund': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300'
+    };
+    
+    return colorMap[normalizedType] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+  };
+
+  // Função para obter o nome amigável do tipo
+  const getFriendlyTypeName = (type: string): string => {
+    const normalizedType = normalizeAssetType(type);
+    const nameMap: { [key: string]: string } = {
+      'equity': 'Ação',
+      'etf': 'ETF',
+      'cryptocurrency': 'Cripto',
+      'currency': 'Forex',
+      'commodity': 'Commodity',
+      'index': 'Índice',
+      'mutualfund': 'Fundo'
+    };
+    
+    return nameMap[normalizedType] || type;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -134,10 +223,10 @@ const SearchPage: React.FC = () => {
               </div>
 
               {/* Filters */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 flex-wrap">
                 <Filter className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-300">Filtrar por:</span>
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 flex-wrap">
                   {filters.map((filter) => (
                     <button
                       key={filter.value}
@@ -153,6 +242,14 @@ const SearchPage: React.FC = () => {
                   ))}
                 </div>
               </div>
+              
+              {/* Results count */}
+              {searchResults.length > 0 && (
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {filteredSearchResults.length} de {searchResults.length} resultados
+                  {selectedFilter !== 'all' && ` (filtrado por ${filters.find(f => f.value === selectedFilter)?.label})`}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -181,7 +278,14 @@ const SearchPage: React.FC = () => {
                               </h3>
                               <p className="text-sm text-gray-600 dark:text-gray-300">{result.name}</p>
                             </div>
-                            <span className="badge-secondary">{result.type}</span>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(result.type)}`}>
+                              {getFriendlyTypeName(result.type)}
+                            </span>
+                            {isBrazilianAsset(result) && (
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                🇧🇷 Brasil
+                              </span>
+                            )}
                           </div>
                           {result.exchange && (
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -207,6 +311,11 @@ const SearchPage: React.FC = () => {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Tente buscar com outros termos ou verifique a ortografia.
                 </p>
+                {selectedFilter !== 'all' && (
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Ou tente remover o filtro "{filters.find(f => f.value === selectedFilter)?.label}".
+                  </p>
+                )}
               </div>
             ) : (
               <div>

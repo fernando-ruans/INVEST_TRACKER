@@ -40,10 +40,18 @@ Um aplicativo web completo para análise de ativos financeiros com gráficos int
 - **Axios** para requisições HTTP
 
 ### Backend
-- **Python** com **FastAPI**
-- **yfinance** para dados do Yahoo Finance
-- **SQLite** para armazenamento local
-- **Uvicorn** como servidor ASGI
+- **Node.js** com **Express**
+- **Sequelize** ORM para banco de dados
+- **PostgreSQL/SQLite** para armazenamento
+- **JWT** para autenticação
+- **Axios** para integração com APIs externas
+
+## 🏗️ Arquitetura
+
+- **Frontend**: React + TypeScript + Tailwind CSS
+- **Backend**: Node.js (Express) + PostgreSQL/SQLite
+- **Mobile**: Capacitor (iOS/Android)
+- **Deploy**: Render.com, Heroku, Vercel
 
 ## 📁 Estrutura do Projeto
 
@@ -58,14 +66,16 @@ INVEST_TRACKER/
 │   │   └── utils/          # Utilitários
 │   ├── public/
 │   └── package.json
-├── backend/                 # API Python
-│   ├── app/
-│   │   ├── api/            # Rotas da API
-│   │   ├── models/         # Modelos de dados
+├── backend-nodejs/          # API Node.js
+│   ├── src/
+│   │   ├── routes/         # Rotas da API
+│   │   ├── models/         # Modelos Sequelize
 │   │   ├── services/       # Serviços de negócio
-│   │   └── database/       # Configuração do banco
-│   ├── requirements.txt
-│   └── main.py
+│   │   ├── middleware/     # Middlewares
+│   │   ├── config/         # Configurações
+│   │   └── server.js       # Servidor principal
+│   ├── package.json
+│   └── README.md
 └── README.md
 ```
 
@@ -101,30 +111,35 @@ npm run build
 
 ### Execução Manual (Separada)
 
-#### Backend (FastAPI)
+#### Backend (Node.js)
 
 1. **Navegue para o diretório do backend:**
 ```bash
-cd backend
+cd backend-nodejs
 ```
 
 2. **Instale as dependências:**
 ```bash
-pip install -r requirements.txt
+npm install
 ```
 
-3. **Configure o banco de dados:**
+3. **Configure as variáveis de ambiente:**
 ```bash
-python setup_database.py
+cp .env.example .env
+# Edite o arquivo .env com suas configurações
 ```
 
 4. **Execute o servidor:**
 ```bash
-python -m uvicorn main:app --reload
+# Desenvolvimento
+npm run dev
+
+# Produção
+npm start
 ```
 
 O backend estará disponível em: http://localhost:8000
-Documentação da API: http://localhost:8000/docs
+Health check: http://localhost:8000/health
 
 #### Frontend (React)
 
@@ -145,9 +160,9 @@ npm start
 
 ## 📊 APIs Utilizadas
 
-- **Yahoo Finance** (via yfinance) - Dados de ativos
-- **News API** - Notícias financeiras
-- **Trading Economics** - Calendário econômico
+- **Yahoo Finance** (via axios) - Dados de ativos e preços
+- **Mock Data** - Notícias financeiras (para demonstração)
+- **Mock Data** - Calendário econômico (para demonstração)
 
 ## 🔧 Configuração
 
@@ -177,9 +192,9 @@ Se você recebeu erros como:
 
 1. **Backend (Web Service):**
    ```
-   Root Directory: backend
-   Build Command: pip install -r requirements.txt
-   Start Command: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+   Root Directory: backend-nodejs
+   Build Command: npm install
+   Start Command: npm start
    ```
 
 2. **Frontend (Static Site):**
@@ -189,7 +204,7 @@ Se você recebeu erros como:
    Publish Directory: build
    ```
 
-3. **Banco PostgreSQL:** Criar separadamente no Render
+3. **Banco PostgreSQL:** Criar separadamente no Render (opcional - usa SQLite por padrão)
 
 ### Deploy Rápido (Alternativo)
 

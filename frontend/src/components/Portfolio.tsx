@@ -43,13 +43,13 @@ const Portfolio: React.FC = () => {
         portfolioService.getPortfolioAssets(portfolioId),
         portfolioService.getPortfolioPerformance(portfolioId)
       ]);
-      console.log('Portfolio assets:', assets);
-      console.log('Portfolio assets detailed:', assets.map(asset => ({
+      console.log('Portfolio assets loaded:', assets);
+      console.log('Portfolio assets with prices:', assets.map(asset => ({
         symbol: asset.symbol,
         currentPrice: asset.currentPrice,
         totalValue: asset.totalValue,
-        profit_loss: asset.gain,
-        profit_loss_percent: asset.gainPercent
+        gain: asset.gain,
+        gainPercent: asset.gainPercent
       })));
       console.log('Portfolio performance:', perf);
       setPortfolioAssets(assets);
@@ -90,7 +90,7 @@ const Portfolio: React.FC = () => {
     if (!selectedPortfolio) return;
     
     try {
-      await portfolioService.removeAssetFromPortfolio(assetId);
+      await portfolioService.removeAssetFromPortfolio(selectedPortfolio.id, assetId);
       loadPortfolioData(selectedPortfolio.id);
     } catch (error) {
       console.error('Erro ao remover ativo:', error);
