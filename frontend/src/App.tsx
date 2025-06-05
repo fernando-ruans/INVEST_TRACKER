@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { BarChart3, PieChart, Newspaper, Calendar, Search, Settings, Menu, X } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Portfolio from './components/Portfolio';
@@ -144,6 +144,8 @@ const SidebarContent: React.FC<{
   user: any; 
   onLogout: () => void; 
 }> = ({ navigation, user, onLogout }) => {
+  const location = useLocation();
+  
   return (
     <div className="flex flex-col h-0 flex-1 bg-white dark:bg-gray-800">
       <div className="flex-1 flex flex-col pt-3 sm:pt-5 pb-4 overflow-y-auto">
@@ -154,24 +156,24 @@ const SidebarContent: React.FC<{
           {navigation.map((item) => {
             const Icon = item.icon;
             return (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                  window.location.pathname === item.href
+                  location.pathname === item.href
                     ? 'bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <Icon
                   className={`mr-3 flex-shrink-0 h-6 w-6 ${
-                    window.location.pathname === item.href
+                    location.pathname === item.href
                       ? 'text-primary-500 dark:text-primary-400'
                       : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400'
                   }`}
                 />
                 {item.name}
-              </a>
+              </Link>
             );
           })}
         </nav>
