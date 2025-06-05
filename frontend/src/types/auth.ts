@@ -15,7 +15,7 @@ export interface User {
 export interface UserRegister {
   email: string;
   username: string;
-  fullName?: string;
+  full_name?: string;
   password: string;
 }
 

@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (email: string, username: string, password: string, fullName?: string) => {
     setIsLoading(true);
     try {
-      await authService.register({ email, username, password, fullName });
+      await authService.register({ email, username, password, full_name: fullName });
       navigate('/login');
     } catch (error) {
       console.error('Erro ao registrar usuário:', error);
