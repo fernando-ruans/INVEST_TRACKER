@@ -82,13 +82,26 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React frontend app build directory
+  const frontendBuildPath = path.join(__dirname, '../../frontend/build');
+  app.use(express.static(frontendBuildPath));
+  console.log('Serving frontend from:', frontendBuildPath);
+  
+  // Handle any requests that don't match the API routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
-});
+} else {
+  // 404 handler for development
+  app.use('*', (req, res) => {
+    res.status(404).json({
+      success: false,
+      message: 'Route not found'
+    });
+  });
+}
 
 // Database connection and server start
 async function startServer() {
