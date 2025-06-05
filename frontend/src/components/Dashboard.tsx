@@ -5,6 +5,7 @@ import { MarketOverview, Portfolio, NewsItem, EconomicEvent, DashboardStats } fr
 import AssetSearch from './AssetSearch';
 import { AdvancedTradingViewChart } from './TradingViewChart';
 import InvestingCalendarWidget from './InvestingCalendarWidget';
+import MarketTicker from './MarketTicker';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useTheme } from '../contexts/ThemeContext';
@@ -22,12 +23,15 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  
+  // Cache para performance dos portfolios (evitar chamadas repetidas)
+  const [performanceCache, setPerformanceCache] = useState<Map<number, { data: any, timestamp: number }>>(new Map());
 
   useEffect(() => {
     loadDashboardData();
     
-    // Atualizar dados a cada 5 minutos
-    const interval = setInterval(loadDashboardData, 5 * 60 * 1000);
+    // Atualizar dados a cada 10 minutos (reduzido de 5 para 10 minutos)
+    const interval = setInterval(loadDashboardData, 10 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -235,10 +239,24 @@ const Dashboard: React.FC = () => {
     let dayGain = 0;
     let dayGainPercent = 0;
     let assetsCount = 0;
+    
+    const now = Date.now();
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos de cache
 
     for (const portfolio of portfolioList) {
       try {
-        const performance = await portfolioService.getPortfolioPerformance(portfolio.id);
+        let performance: any;
+        const cached = performanceCache.get(portfolio.id);
+        
+        // Verificar se temos dados em cache válidos
+        if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+          performance = cached.data;
+        } else {
+          // Buscar dados frescos e atualizar cache
+          performance = await portfolioService.getPortfolioPerformance(portfolio.id);
+          setPerformanceCache(prev => new Map(prev.set(portfolio.id, { data: performance, timestamp: now })));
+        }
+        
         totalValue += performance.totalValue;
         totalGain += performance.totalGain;
         dayGain += performance.dayGain;
@@ -351,6 +369,11 @@ const Dashboard: React.FC = () => {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Market Ticker */}
+        <div className="mb-6">
+          <MarketTicker className="rounded-lg shadow-sm" />
+        </div>
+
         {/* Welcome Section */}
         {user && (
           <div className="bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700 rounded-lg shadow-lg mb-8 overflow-hidden">

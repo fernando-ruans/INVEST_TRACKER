@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, memo } from 'react';
 import TradingViewWidget from 'react-tradingview-widget';
 import { useTheme } from '../contexts/ThemeContext';
+import { suppressTradingViewErrors } from '../utils/errorSuppression';
 
 // Converter símbolos brasileiros para formato TradingView
 const formatSymbolForTradingView = (inputSymbol: string): string => {
@@ -185,13 +186,18 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
     // Função para criar o widget
     const createWidget = () => {
       if (!containerRef.current || !window.TradingView) {
-        console.warn('TradingView não disponível ou container não encontrado');
         return;
       }
 
       try {
         setTimeout(() => {
           if (!containerRef.current) return;
+          
+          // Verificar se o ambiente é válido
+          if (typeof window === 'undefined' || !window.TradingView) {
+            return;
+          }
+          
           const config = {
             autosize: true,
             symbol: symbol,
@@ -252,10 +258,19 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
             hide_legend: false,
             range: range || "12M",
           };
+          // Suprimir erros de console do TradingView usando utilitário centralizado
+          const stopSuppression = suppressTradingViewErrors(15000); // 15 segundos
+
           widgetRef.current = new window.TradingView.widget(config);
+          
+          // Cleanup será feito automaticamente pelo utilitário
         }, 100);
-      } catch (error) {
-        console.error('Erro ao criar widget TradingView:', error);
+      } catch (error: any) {
+        // Silenciar erros relacionados ao TradingView
+        if (!error?.message?.includes('Invalid environment') && 
+            !error?.message?.includes('contentWindow')) {
+          console.error('Erro ao criar widget TradingView:', error);
+        }
         if (containerRef.current) {
           containerRef.current.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;">
@@ -282,7 +297,10 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
         script.async = true;
         script.onload = createWidget;
         script.onerror = () => {
-          console.error('Erro ao carregar script do TradingView');
+          // Silenciar erro de carregamento se for relacionado ao ambiente
+          if (typeof window !== 'undefined') {
+            console.error('Erro ao carregar script do TradingView');
+          }
           if (containerRef.current) {
             containerRef.current.innerHTML = `
               <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;">

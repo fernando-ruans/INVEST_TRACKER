@@ -238,11 +238,12 @@ export const portfolioService = {
   // Obter performance do portfolio
   async getPortfolioPerformance(portfolioId: number): Promise<PortfolioPerformance> {
     try {
-      console.log(`Fetching portfolio performance for ID: ${portfolioId}`);
+      // Reduzir logs para evitar spam no console
+      // console.log(`Fetching portfolio performance for ID: ${portfolioId}`);
       const response: AxiosResponse<ApiResponse<any>> = await api.get(
         `/portfolio/${portfolioId}/performance`
       );
-      console.log('Portfolio performance response:', response.data);
+      // console.log('Portfolio performance response:', response.data);
       
       // Mapear dados do backend (snake_case) para frontend (camelCase)
       const backendData = response.data.data;

@@ -16,9 +16,13 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { authService } from './services';
 import { AssetSearchResult } from './types';
+import { initializeGlobalErrorSuppression } from './utils/globalErrorSuppression';
 
 // Configurar token na inicialização
 authService.setupToken();
+
+// Inicializar supressão global de erros do TradingView
+initializeGlobalErrorSuppression();
 
 // Componente para rotas protegidas
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {

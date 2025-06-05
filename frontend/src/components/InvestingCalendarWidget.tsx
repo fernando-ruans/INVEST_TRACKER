@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import { suppressTradingViewErrors } from '../utils/errorSuppression';
 
 // Hook para detectar o tamanho da tela
 const useWindowSize = () => {
@@ -76,10 +77,18 @@ const InvestingCalendarWidget: React.FC<InvestingCalendarWidgetProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Limpar qualquer conteúdo anterior
+    // Verificar se o ambiente é válido
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    // Limpar conteúdo anterior
     if (containerRef.current) {
       containerRef.current.innerHTML = '';
     }
+
+    // Suprimir erros de console do TradingView usando utilitário centralizado
+    const stopSuppression = suppressTradingViewErrors(15000); // 15 segundos
 
     // Criar a estrutura do widget
     const widgetContainer = document.createElement('div');
@@ -106,6 +115,7 @@ const InvestingCalendarWidget: React.FC<InvestingCalendarWidgetProps> = ({
 
     // Limpar ao desmontar
     return () => {
+      stopSuppression(); // Para a supressão de erros
       if (containerRef.current) {
         containerRef.current.innerHTML = '';
       }
