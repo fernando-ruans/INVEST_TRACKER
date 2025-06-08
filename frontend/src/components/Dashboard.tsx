@@ -325,29 +325,30 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center py-4 lg:py-6 space-y-4 lg:space-y-0">
+            <div className="flex-shrink-0">
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+              <p className="mt-1 text-xs lg:text-sm text-gray-500 dark:text-gray-400">
                 Última atualização: {format(lastUpdate, 'dd/MM/yyyy HH:mm', { locale: ptBR })}
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 lg:space-x-4">
               <AssetSearch
                 onAssetSelect={(asset: any) => {
                   if (asset && asset.symbol && asset.symbol.trim() !== '') {
                     setSelectedSymbol(asset.symbol);
                   }
                 }}
-                className="w-80"
-                placeholder="Buscar ativo para o gráfico..."
+                className="w-full sm:w-64 lg:w-80"
+                placeholder="Buscar ativo..."
               />
               <button
                 onClick={loadDashboardData}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="inline-flex items-center justify-center px-3 lg:px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 whitespace-nowrap"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Atualizar
+                <RefreshCw className="h-4 w-4 mr-1 lg:mr-2" />
+                <span className="hidden sm:inline">Atualizar</span>
+                <span className="sm:hidden">Sync</span>
               </button>
             </div>
           </div>
@@ -376,31 +377,31 @@ const Dashboard: React.FC = () => {
 
         {/* Welcome Section */}
         {user && (
-          <div className="bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700 rounded-lg shadow-lg mb-8 overflow-hidden">
-            <div className="px-6 py-8">
-              <div className="flex items-center space-x-4">
+          <div className="bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700 rounded-lg shadow-lg mb-6 lg:mb-8 overflow-hidden">
+            <div className="px-4 sm:px-6 py-6 lg:py-8">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
                 <div className="flex-shrink-0">
                   {user.avatar ? (
                     <img
                       src={user.avatar?.startsWith('http') ? user.avatar : `http://localhost:8000/uploads/avatars/${user.avatar.split('/').pop()}`}
                       alt={user.fullName || user.username}
-                      className="h-16 w-16 rounded-full border-4 border-white shadow-lg object-cover"
+                      className="h-12 w-12 sm:h-16 sm:w-16 rounded-full border-4 border-white shadow-lg object-cover"
                     />
                   ) : (
-                    <div className="h-16 w-16 rounded-full bg-white/20 border-4 border-white shadow-lg flex items-center justify-center">
-                      <User className="h-8 w-8 text-white" />
+                    <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-white/20 border-4 border-white shadow-lg flex items-center justify-center">
+                      <User className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                     </div>
                   )}
                 </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-white">
+                <div className="flex-1 text-center sm:text-left">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                     Bem-vindo de volta, {user.fullName || user.username}!
                   </h2>
-                  <p className="text-primary-100 mt-1">
+                  <p className="text-primary-100 mt-1 text-sm lg:text-base">
                     Aqui está um resumo dos seus investimentos hoje
                   </p>
                 </div>
-                <div className="hidden md:block">
+                <div className="hidden lg:block">
                   <div className="text-right">
                     <p className="text-primary-100 text-sm">
                       {format(new Date(), "EEEE, dd 'de' MMMM", { locale: ptBR })}
@@ -417,17 +418,17 @@ const Dashboard: React.FC = () => {
 
         {/* Stats Cards */}
         {dashboardStats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
             <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-              <div className="p-5">
+              <div className="p-3 sm:p-4 lg:p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <DollarSign className="h-6 w-6 text-gray-400 dark:text-gray-300" />
+                    <DollarSign className="h-5 w-5 lg:h-6 lg:w-6 text-gray-400 dark:text-gray-300" />
                   </div>
-                  <div className="ml-5 w-0 flex-1">
+                  <div className="ml-3 lg:ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Valor Total</dt>
-                      <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      <dt className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Valor Total</dt>
+                      <dd className="text-sm sm:text-base lg:text-lg font-medium text-gray-900 dark:text-white">
                         {formatCurrency(dashboardStats.totalPortfolioValue)}
                       </dd>
                     </dl>
@@ -437,15 +438,15 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-              <div className="p-5">
+              <div className="p-3 sm:p-4 lg:p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <TrendingUp className="h-6 w-6 text-gray-400 dark:text-gray-300" />
+                    <TrendingUp className="h-5 w-5 lg:h-6 lg:w-6 text-gray-400 dark:text-gray-300" />
                   </div>
-                  <div className="ml-5 w-0 flex-1">
+                  <div className="ml-3 lg:ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho Total</dt>
-                      <dd className={`text-lg font-medium ${getChangeColor(dashboardStats.totalGain)}`}>
+                      <dt className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho Total</dt>
+                      <dd className={`text-sm sm:text-base lg:text-lg font-medium ${getChangeColor(dashboardStats.totalGain)}`}>
                         {formatCurrency(dashboardStats.totalGain)}
                       </dd>
                     </dl>
@@ -455,15 +456,15 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-              <div className="p-5">
+              <div className="p-3 sm:p-4 lg:p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <Activity className="h-6 w-6 text-gray-400 dark:text-gray-300" />
+                    <Activity className="h-5 w-5 lg:h-6 lg:w-6 text-gray-400 dark:text-gray-300" />
                   </div>
-                  <div className="ml-5 w-0 flex-1">
+                  <div className="ml-3 lg:ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho/Perda</dt>
-                      <dd className={`text-lg font-medium ${getChangeColor(dashboardStats.totalGainPercent)}`}>
+                      <dt className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Ganho/Perda</dt>
+                      <dd className={`text-sm sm:text-base lg:text-lg font-medium ${getChangeColor(dashboardStats.totalGainPercent)}`}>
                         {formatPercent(dashboardStats.totalGainPercent)}
                       </dd>
                     </dl>
@@ -473,15 +474,15 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-              <div className="p-5">
+              <div className="p-3 sm:p-4 lg:p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <TrendingUp className="h-6 w-6 text-gray-400 dark:text-gray-300" />
+                    <TrendingUp className="h-5 w-5 lg:h-6 lg:w-6 text-gray-400 dark:text-gray-300" />
                   </div>
-                  <div className="ml-5 w-0 flex-1">
+                  <div className="ml-3 lg:ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Portfolios</dt>
-                      <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      <dt className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Portfolios</dt>
+                      <dd className="text-sm sm:text-base lg:text-lg font-medium text-gray-900 dark:text-white">
                         {dashboardStats.portfoliosCount}
                       </dd>
                     </dl>
@@ -493,21 +494,24 @@ const Dashboard: React.FC = () => {
         )}
 
         {/* Gráfico Principal - Largura Total */}
-        <div className="mb-8">
+        <div className="mb-6 lg:mb-8">
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
                 Gráfico - {selectedSymbol}
               </h3>
             </div>
-            <div className="p-6">
+            <div className="p-3 sm:p-4 lg:p-6">
               {selectedSymbol ? (
-                <AdvancedTradingViewChart symbol={selectedSymbol} height={600} />
+                <AdvancedTradingViewChart 
+                  symbol={selectedSymbol} 
+                  height={window.innerWidth < 640 ? 300 : window.innerWidth < 1024 ? 400 : 600} 
+                />
               ) : (
-                <div className="flex items-center justify-center h-96 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+                <div className="flex items-center justify-center h-48 sm:h-64 lg:h-96 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
                   <div className="text-center">
-                    <div className="text-4xl mb-4">📊</div>
-                    <p className="text-gray-500 dark:text-gray-400">Selecione um ativo para visualizar o gráfico</p>
+                    <div className="text-2xl sm:text-3xl lg:text-4xl mb-2 lg:mb-4">📊</div>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Selecione um ativo para visualizar o gráfico</p>
                   </div>
                 </div>
               )}
@@ -516,13 +520,13 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Cards Informativos - Abaixo do Gráfico */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Índices Principais */}
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Índices Principais</h3>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Índices Principais</h3>
             </div>
-            <div className="p-6 overflow-y-auto">
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-96 sm:max-h-none">
               {marketOverview && marketOverview.indices && marketOverview.indices.length > 0 ? (
                 <div className="space-y-6">
                   {/* Brasil */}
@@ -678,16 +682,16 @@ const Dashboard: React.FC = () => {
 
           {/* Eventos de Hoje */}
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-gray-400 dark:text-gray-300 mr-2" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Eventos de Hoje</h3>
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-300 mr-2" />
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Eventos de Hoje</h3>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-3 sm:p-4 lg:p-6">
               <InvestingCalendarWidget 
                 theme={theme === 'dark' ? 'dark' : 'light'}
-                height={window.innerWidth < 768 ? 500 : window.innerWidth < 1024 ? 700 : 1000} 
+                height={window.innerWidth < 480 ? 300 : window.innerWidth < 768 ? 400 : window.innerWidth < 1024 ? 500 : 600} 
                 width="100%"
                 timeSpan="today"
                 showCountries={['BR', 'US', 'EU', 'GB', 'CN', 'JP']}
@@ -699,28 +703,28 @@ const Dashboard: React.FC = () => {
 
           {/* Notícias */}
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center">
-                <Newspaper className="h-5 w-5 text-gray-400 dark:text-gray-300 mr-2" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Últimas Notícias</h3>
+                <Newspaper className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-300 mr-2" />
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Últimas Notícias</h3>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6 max-h-96 sm:max-h-none overflow-y-auto">
               {news.length > 0 ? (
-                <div className="space-y-4">
-                  {news.map((article, index) => (
+                <div className="space-y-3 sm:space-y-4">
+                  {news.slice(0, window.innerWidth < 640 ? 5 : news.length).map((article, index) => (
                     <div key={index} className="border-b border-gray-100 dark:border-gray-700 last:border-b-0 pb-3 last:pb-0">
                       <a
                         href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block hover:bg-gray-50 dark:hover:bg-gray-700 -m-2 p-2 rounded"
+                        className="block hover:bg-gray-50 dark:hover:bg-gray-700 -m-2 p-2 rounded transition-colors"
                       >
-                        <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
                           {article.title}
                         </p>
-                        <div className="flex justify-between items-center mt-2">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{article.source}</p>
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 space-y-1 sm:space-y-0">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{article.source}</p>
                           <p className="text-xs text-gray-400 dark:text-gray-500">
                             {article.publishedDate && !isNaN(new Date(article.publishedDate).getTime()) 
                               ? format(new Date(article.publishedDate), 'dd/MM HH:mm', { locale: ptBR })
@@ -733,7 +737,7 @@ const Dashboard: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">Nenhuma notícia disponível.</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Nenhuma notícia disponível.</p>
               )}
             </div>
           </div>

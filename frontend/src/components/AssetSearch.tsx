@@ -192,8 +192,8 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
     <div ref={searchRef} className={`relative ${className}`}>
       {/* Input de busca */}
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+          <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-300" />
         </div>
         <input
           ref={inputRef}
@@ -203,15 +203,15 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
           onKeyDown={handleKeyDown}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-sm"
+          className="block w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-xs sm:text-sm"
         />
         {query && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+          <div className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center">
             <button
               onClick={clearSearch}
               className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 focus:outline-none"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         )}
@@ -219,19 +219,19 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
 
       {/* Dropdown de resultados */}
       {showResults && (
-        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-96 rounded-md py-1 text-base ring-1 ring-black dark:ring-gray-600 ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-80 sm:max-h-96 rounded-md py-1 text-sm sm:text-base ring-1 ring-black dark:ring-gray-600 ring-opacity-5 overflow-auto focus:outline-none">
           {/* Header para trending */}
           {!query.trim() && showTrending && trendingAssets.length > 0 && (
-            <div className="px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide border-b border-gray-100 dark:border-gray-700 flex items-center">
-              <TrendingUp className="h-4 w-4 mr-1" />
+            <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide border-b border-gray-100 dark:border-gray-700 flex items-center">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               Em Alta
             </div>
           )}
 
           {/* Loading */}
           {isLoading && (
-            <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 flex items-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600 mr-2"></div>
+            <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center">
+              <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-primary-600 mr-2"></div>
               Buscando...
             </div>
           )}
@@ -241,29 +241,29 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
             <button
               key={`${asset.symbol}-${asset.exchange}`}
               onClick={() => handleAssetSelect(asset)}
-              className={`w-full text-left px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 ${
+              className={`w-full text-left px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 ${
                 index === selectedIndex ? 'bg-primary-50 dark:bg-primary-900/30' : ''
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className="text-lg">{getAssetTypeIcon(asset.type)}</span>
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium text-gray-900 dark:text-white">{asset.symbol}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getAssetTypeColor(asset.type)} bg-gray-100 dark:bg-gray-700`}>
+                <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                  <span className="text-sm sm:text-lg flex-shrink-0">{getAssetTypeIcon(asset.type)}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <span className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm">{asset.symbol}</span>
+                      <span className={`text-xs px-1 sm:px-2 py-0.5 rounded-full ${getAssetTypeColor(asset.type)} bg-gray-100 dark:bg-gray-700 hidden sm:inline`}>
                         {asset.type ? asset.type.toUpperCase() : 'STOCK'}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                       {asset.name}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex-shrink-0 ml-2">
                   <div className="text-xs text-gray-500 dark:text-gray-400">{asset.exchange}</div>
                   {asset.currency && (
-                    <div className="text-xs text-gray-400 dark:text-gray-500">{asset.currency}</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">{asset.currency}</div>
                   )}
                 </div>
               </div>
@@ -272,7 +272,7 @@ const AssetSearch: React.FC<AssetSearchProps> = ({
 
           {/* Nenhum resultado */}
           {!isLoading && query.trim() && results.length === 0 && (
-            <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Nenhum ativo encontrado para "{query}"
             </div>
           )}

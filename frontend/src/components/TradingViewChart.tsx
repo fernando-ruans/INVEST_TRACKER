@@ -398,14 +398,28 @@ export const AdvancedTradingViewChart: React.FC<{
   height?: number;
   theme?: 'light' | 'dark';
   interval?: string;
-}> = ({ symbol, height = 600, theme, interval = 'D' }) => {
+}> = ({ symbol, height, theme, interval = 'D' }) => {
   const formattedSymbol = formatSymbolForTradingView(symbol);
   const fallbackSymbol = 'BINANCE:BTCUSDT';
+  
+  // Altura responsiva baseada no tamanho da tela
+  const getResponsiveHeight = () => {
+    if (height) return height;
+    
+    if (typeof window !== 'undefined') {
+      const screenWidth = window.innerWidth;
+      if (screenWidth < 480) return 300;
+      if (screenWidth < 768) return 400;
+      if (screenWidth < 1024) return 500;
+      return 600;
+    }
+    return 600;
+  };
   
   return (
     <TradingViewChart
       symbol={formattedSymbol || fallbackSymbol}
-      height={height}
+      height={getResponsiveHeight()}
       theme={theme}
       interval={interval}
       hide_side_toolbar={false}
