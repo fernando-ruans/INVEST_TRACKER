@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Lock, Upload, X, Camera, Edit3, Save, Key } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { getAvatarUrlWithTimestamp, createFilePreview } from '../utils/imageUtils';
+import AvatarImage from './AvatarImage';
 
 const ProfilePage: React.FC = () => {
   const { user, updateUser, updatePassword, logout, uploadAvatar, removeAvatar } = useAuth();
@@ -27,7 +29,7 @@ const ProfilePage: React.FC = () => {
         username: user.username || '',
         fullName: user.fullName || ''
       });
-      setAvatarPreview(user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/uploads/avatars/${user.avatar.split('/').pop()}`) : null);
+      setAvatarPreview(getAvatarUrlWithTimestamp(user.avatar));
     }
   }, [user]);
 
@@ -71,15 +73,16 @@ const ProfilePage: React.FC = () => {
   };
 
   // Manipulador para seleção de arquivo de avatar
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setAvatarFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const preview = await createFilePreview(file);
+        setAvatarPreview(preview);
+      } catch (error) {
+        console.error('Erro ao criar preview do avatar:', error);
+      }
     }
   };
 
@@ -221,11 +224,20 @@ const ProfilePage: React.FC = () => {
                   <div className="relative">
                     {avatarPreview ? (
                       <div className="relative">
-                        <img 
-                          src={avatarPreview} 
-                          alt="Avatar do usuário" 
-                          className="h-32 w-32 rounded-full object-cover border-4 border-primary-500"
-                        />
+                        {avatarFile ? (
+                          <img 
+                            src={avatarPreview} 
+                            alt="Preview do avatar" 
+                            className="h-32 w-32 rounded-full object-cover border-4 border-primary-500"
+                          />
+                        ) : (
+                          <AvatarImage
+                            avatar={user?.avatar}
+                            alt="Avatar do usuário"
+                            size="xl"
+                            className="border-4 border-primary-500"
+                          />
+                        )}
                         <button
                           type="button"
                           onClick={handleRemoveAvatar}
@@ -235,9 +247,12 @@ const ProfilePage: React.FC = () => {
                         </button>
                       </div>
                     ) : (
-                      <div className="h-32 w-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                        <User className="h-16 w-16 text-gray-400" />
-                      </div>
+                      <AvatarImage
+                        avatar={user?.avatar}
+                        alt="Avatar do usuário"
+                        size="xl"
+                        className="border-4 border-gray-300 dark:border-gray-600"
+                      />
                     )}
                     
                     <button

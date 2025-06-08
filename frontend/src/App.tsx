@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { getAvatarUrlWithTimestamp } from './utils/imageUtils';
+import AvatarImage from './components/AvatarImage';
 import { BarChart3, PieChart, Newspaper, Calendar, Search, Settings, Menu, X } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Portfolio from './components/Portfolio';
@@ -186,19 +189,12 @@ const SidebarContent: React.FC<{
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              {user?.avatar ? (
-                <img 
-                  src={user.avatar?.startsWith('http') ? user.avatar : `http://localhost:8000/uploads/avatars/${user.avatar.split('/').pop()}`} 
-                  alt="Avatar do usuário" 
-                  className="h-8 w-8 rounded-full object-cover border-2 border-primary-500"
-                />
-              ) : (
-                <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">
-                    {user?.fullName ? user.fullName.charAt(0).toUpperCase() : user?.username?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-              )}
+              <AvatarImage
+                avatar={user?.avatar}
+                alt="Avatar do usuário"
+                size="sm"
+                className="border-2 border-primary-500"
+              />
             </div>
             <div className="ml-3 flex-1">
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">

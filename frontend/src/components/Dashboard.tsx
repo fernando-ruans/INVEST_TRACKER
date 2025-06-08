@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Activity, Calendar, Newspaper, AlertCircle, RefreshCw, User } from 'lucide-react';
+import { getAvatarUrlWithTimestamp } from '../utils/imageUtils';
+import AvatarImage from './AvatarImage';
 import { assetService, portfolioService, newsService, calendarService } from '../services/api';
 import { MarketOverview, Portfolio, NewsItem, EconomicEvent, DashboardStats } from '../types';
 import AssetSearch from './AssetSearch';
@@ -381,17 +383,12 @@ const Dashboard: React.FC = () => {
             <div className="px-4 sm:px-6 py-6 lg:py-8">
               <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
                 <div className="flex-shrink-0">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar?.startsWith('http') ? user.avatar : `http://localhost:8000/uploads/avatars/${user.avatar.split('/').pop()}`}
-                      alt={user.fullName || user.username}
-                      className="h-12 w-12 sm:h-16 sm:w-16 rounded-full border-4 border-white shadow-lg object-cover"
-                    />
-                  ) : (
-                    <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-white/20 border-4 border-white shadow-lg flex items-center justify-center">
-                      <User className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                    </div>
-                  )}
+                  <AvatarImage
+                     avatar={user.avatar}
+                     alt={user.fullName || user.username}
+                     size="lg"
+                     className="border-4 border-white shadow-lg"
+                   />
                 </div>
                 <div className="flex-1 text-center sm:text-left">
                   <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">

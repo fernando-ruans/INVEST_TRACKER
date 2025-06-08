@@ -176,24 +176,28 @@ const MarketTicker: React.FC<MarketTickerProps> = ({ className = '' }) => {
     return nameMap[symbol] || name.substring(0, 10);
   };
 
-  console.log('🎯 MarketTicker: Renderizando ticker com dados:', tickerData.length, 'ativos', 'isLoading:', isLoading);
+  // Renderização instantânea: mostra ticker mesmo durante carregamento, se houver dados
+  const hasData = tickerData.length > 0;
+  // Duração da animação proporcional ao número de ativos (mínimo 18s)
+  const animationDuration = Math.max(18, tickerData.length * 2.5);
 
   return (
     <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${className}`}>
-      {isLoading ? (
-        <div className="flex items-center justify-center py-3 sm:py-4">
-          <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-primary-600"></div>
-          <span className="ml-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Carregando dados do mercado...</span>
-        </div>
-      ) : tickerData.length === 0 ? (
-        <div className="flex items-center justify-center py-3 sm:py-4">
-          <div className="text-sm text-gray-500 dark:text-gray-400">📊 Dados de mercado indisponíveis no momento</div>
-        </div>
+      {!hasData ? (
+        isLoading ? (
+          <div className="flex items-center justify-center py-3 sm:py-4">
+            <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-primary-600"></div>
+            <span className="ml-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Carregando dados do mercado...</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-3 sm:py-4">
+            <div className="text-sm text-gray-500 dark:text-gray-400">📊 Dados de mercado indisponíveis no momento</div>
+          </div>
+        )
       ) : (
         <div className="ticker-container">
-          <div className="ticker-content">
-            {/* Triplicar os dados para criar um loop contínuo */}
-            {[...tickerData, ...tickerData, ...tickerData].map((item, index) => (
+          <div className="ticker-content" style={{ animationDuration: `${animationDuration}s` }}>
+            {[...tickerData, ...tickerData].map((item, index) => (
               <div key={`${item.symbol}-${index}`} className="ticker-item">
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <span className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm truncate max-w-20 sm:max-w-none">{getDisplayName(item.name, item.symbol)}</span>
@@ -217,7 +221,6 @@ const MarketTicker: React.FC<MarketTickerProps> = ({ className = '' }) => {
           </div>
         </div>
       )}
-
       <style>{`
         .ticker-container {
           overflow: hidden;
@@ -227,23 +230,19 @@ const MarketTicker: React.FC<MarketTickerProps> = ({ className = '' }) => {
           display: flex;
           align-items: center;
         }
-        
         @media (min-width: 640px) {
           .ticker-container {
             height: 60px;
           }
         }
-        
         .ticker-content {
           display: flex;
-          animation: ticker-scroll 180s linear infinite;
+          animation: ticker-scroll linear infinite;
           will-change: transform;
         }
-        
         .ticker-content:hover {
           animation-play-state: paused;
         }
-        
         .ticker-item {
           flex-shrink: 0;
           padding: 0 0.75rem;
@@ -251,20 +250,18 @@ const MarketTicker: React.FC<MarketTickerProps> = ({ className = '' }) => {
           align-items: center;
           height: 40px;
         }
-        
         @media (min-width: 640px) {
           .ticker-item {
             padding: 0 2rem;
             height: 60px;
           }
         }
-        
         @keyframes ticker-scroll {
           0% {
-            transform: translateX(100%);
+            transform: translateX(0);
           }
           100% {
-            transform: translateX(-100%);
+            transform: translateX(-50%);
           }
         }
       `}</style>
