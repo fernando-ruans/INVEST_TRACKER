@@ -140,6 +140,16 @@ const AuthenticatedApp: React.FC = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
+          <footer className="w-full text-center py-4 bg-gradient-to-r from-primary-50 via-gray-100 to-primary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700 flex flex-col items-center gap-1">
+            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
+              © {new Date().getFullYear()} <span className="font-semibold text-primary-700 dark:text-primary-300 ml-1">Invest Tracker</span>
+              <span className="mx-1">•</span>
+              Feito com
+              <span className="animate-pulse text-red-500 mx-1">♥</span>
+              no Brasil
+            </span>
+            <span className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-600">Desenvolvido por sua equipe favorita 🚀</span>
+          </footer>
         </div>
         </div>
   );
