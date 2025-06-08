@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { assetService } from '../services/api';
-import { AssetInfo } from '../types';
 
 interface MarketTickerProps {
   className?: string;
@@ -15,256 +14,185 @@ interface TickerItem {
   changePercent: number;
 }
 
+// Lista de símbolos para buscar dados reais
+const tickerSymbols = [
+  'IBOV', 'USD', 'EUR', 'BTC', 'ETH', 'PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3',
+  'MGLU3', 'WEGE3', 'SUZB3', 'RENT3', 'LREN3', 'JBSS3', 'RADL3', 'GGBR4', 'CSNA3', 'VIVT3'
+];
+
+// Dados iniciais para carregamento (serão substituídos por dados reais)
+const initialTickerData: TickerItem[] = [
+  { symbol: 'IBOV', name: 'Ibovespa', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'USD', name: 'Dólar', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'EUR', name: 'Euro', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'BTC', name: 'Bitcoin', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'ETH', name: 'Ethereum', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'PETR4', name: 'Petrobras', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'VALE3', name: 'Vale', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'ITUB4', name: 'Itaú', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'BBDC4', name: 'Bradesco', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'ABEV3', name: 'Ambev', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'MGLU3', name: 'Magazine Luiza', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'WEGE3', name: 'WEG', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'SUZB3', name: 'Suzano', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'RENT3', name: 'Localiza', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'LREN3', name: 'Lojas Renner', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'JBSS3', name: 'JBS', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'RADL3', name: 'Raia Drogasil', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'GGBR4', name: 'Gerdau', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'CSNA3', name: 'CSN', price: 0, change: 0, changePercent: 0 },
+  { symbol: 'VIVT3', name: 'Vivo', price: 0, change: 0, changePercent: 0 }
+];
+
 const MarketTicker: React.FC<MarketTickerProps> = ({ className = '' }) => {
-  const [tickerData, setTickerData] = useState<TickerItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [tickerData, setTickerData] = useState<TickerItem[]>(initialTickerData);
+  const [loading, setLoading] = useState(true);
   
-  // Cache local para dados do ticker
-  const tickerCache = useRef<{[key: string]: TickerItem}>({});
-  
-  // Usar dados em cache enquanto carrega
-  useEffect(() => {
-    // Recuperar cache do localStorage
+  // Função para buscar dados reais da API
+  const fetchRealData = async () => {
     try {
-      const cachedData = localStorage.getItem('tickerCache');
-      if (cachedData) {
-        const parsedCache = JSON.parse(cachedData);
-        const cachedItems = Object.values(parsedCache) as TickerItem[];
-        if (cachedItems.length > 0) {
-          console.log('🎯 MarketTicker: Usando dados em cache enquanto carrega');
-          setTickerData(cachedItems);
-          setIsLoading(false);
-          tickerCache.current = parsedCache;
-        }
-      }
-    } catch (error) {
-      console.warn('Erro ao recuperar cache do ticker:', error);
-    }
-  }, []);
-
-  // Principais índices e ativos para o ticker (reduzido para melhor performance)
-  const tickerSymbols = [
-    '^BVSP', // Ibovespa
-    'USDBRL=X', // Dólar
-    'BTC-USD', // Bitcoin
-    '^GSPC', // S&P 500
-    'PETR4.SA', // Petrobras
-    'VALE3.SA', // Vale
-    'ITUB4.SA', // Itaú
-    'BBDC4.SA' // Bradesco
-  ];
-
-  const loadTickerData = async () => {
-    try {
-      console.log('🎯 MarketTicker: Iniciando carregamento dos dados...');
-      setIsLoading(true);
-      
-      // Função para carregar com timeout
-      const loadWithTimeout = async (symbol: string, timeout = 5000): Promise<any> => {
-        return Promise.race([
-          assetService.getAssetInfo(symbol),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), timeout)
-          )
-        ]);
-      };
-
-      const promises = tickerSymbols.map(async (symbol): Promise<TickerItem | null> => {
+      const promises = tickerSymbols.map(async (symbol) => {
         try {
-          const data = await loadWithTimeout(symbol, 3000) as any; // 3 segundos de timeout
+          const assetInfo = await assetService.getAssetInfo(symbol);
           return {
-            symbol: data.symbol,
-            name: data.name || symbol,
-            price: data.price || 0,
-            change: data.change || 0,
-            changePercent: data.changePercent || 0
+            symbol: assetInfo.symbol,
+            name: assetInfo.name,
+            price: assetInfo.price,
+            change: assetInfo.change,
+            changePercent: assetInfo.changePercent
           };
         } catch (error) {
-          console.warn(`❌ Timeout ou erro ao carregar ${symbol}`);
+          console.warn(`Erro ao buscar dados para ${symbol}:`, error);
+          // Retorna null para filtrar ativos sem dados reais
           return null;
         }
       });
-
-      // Aguardar no máximo 8 segundos para todas as requisições
-      const timeoutPromise = new Promise<TickerItem[]>((resolve) => {
-        setTimeout(() => {
-          console.log('⏰ Timeout geral atingido, usando dados parciais');
-          resolve([]);
-        }, 8000);
-      });
-
-      const raceResult = await Promise.race([
-        Promise.all(promises),
-        timeoutPromise
-      ]) as (TickerItem | null)[];
-
-      const validResults = raceResult.filter((item): item is TickerItem => item !== null);
-       console.log(`🎯 MarketTicker: ${validResults.length} ativos carregados:`, validResults);
-       
-       if (validResults.length > 0) {
-         setTickerData(validResults);
-         
-         // Atualizar cache
-         const newCache: {[key: string]: TickerItem} = {};
-         validResults.forEach(item => {
-           newCache[item.symbol] = item;
-         });
-         tickerCache.current = { ...tickerCache.current, ...newCache };
-         
-         // Salvar no localStorage
-         try {
-           localStorage.setItem('tickerCache', JSON.stringify(tickerCache.current));
-         } catch (error) {
-           console.warn('Erro ao salvar cache do ticker:', error);
-         }
-       }
+      
+      const results = await Promise.all(promises);
+      // Filtrar apenas ativos com dados reais (remover nulls)
+      const realData = results.filter(item => item !== null) as TickerItem[];
+      
+      if (realData.length === 0) {
+        console.warn('Nenhum dado real disponível no momento');
+        setTickerData([{ symbol: 'INFO', name: 'Dados indisponíveis', price: 0, change: 0, changePercent: 0 }]);
+      } else {
+        setTickerData(realData);
+      }
+      setLoading(false);
     } catch (error) {
-      console.error('❌ Erro geral ao carregar dados do ticker:', error);
-    } finally {
-      setIsLoading(false);
-      console.log('🎯 MarketTicker: Carregamento finalizado');
+      console.error('Erro ao buscar dados do ticker:', error);
+      setLoading(false);
     }
   };
-
+  
+  // Carregar dados iniciais e configurar atualizações periódicas
   useEffect(() => {
-    // Só carregar dados se não tiver cache válido
-    if (tickerData.length === 0) {
-      loadTickerData();
-    }
+    // Buscar dados imediatamente
+    fetchRealData();
     
-    // Atualizar dados a cada 5 minutos (menos frequente)
-    const dataInterval = setInterval(loadTickerData, 300000);
-    
-    return () => clearInterval(dataInterval);
+    // Atualizar dados a cada 30 segundos
+    const interval = setInterval(fetchRealData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const formatPrice = (price: number, symbol: string) => {
-    if (symbol.includes('BRL') || symbol.includes('USD')) {
-      return price.toFixed(4);
-    }
-    if (symbol.includes('BTC') || symbol.includes('ETH')) {
-      return price.toLocaleString('pt-BR', { 
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0 
-      });
-    }
-    return price.toLocaleString('pt-BR', { 
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    });
+    if (symbol === 'USD') return `R$ ${price.toFixed(2)}`;
+    if (symbol === 'EUR') return `R$ ${price.toFixed(2)}`;
+    if (symbol === 'BTC') return `$ ${price.toLocaleString()}`;
+    if (symbol === 'ETH') return `$ ${price.toLocaleString()}`;
+    if (symbol === 'IBOV') return price.toFixed(0);
+    return `R$ ${price.toFixed(2)}`;
   };
 
-  const getDisplayName = (name: string, symbol: string) => {
-    const nameMap: { [key: string]: string } = {
-      '^BVSP': 'IBOV',
-      'BOVA11.SA': 'BOVA11',
-      'USDBRL=X': 'USD/BRL',
-      'EURBRL=X': 'EUR/BRL',
-      'BTC-USD': 'Bitcoin',
-      'ETH-USD': 'Ethereum',
-      'GC=F': 'Ouro',
-      'CL=F': 'Petróleo',
-      '^GSPC': 'S&P 500',
-      '^IXIC': 'Nasdaq',
-      '^DJI': 'Dow Jones',
-      'PETR4.SA': 'PETR4',
-      'VALE3.SA': 'VALE3',
-      'ITUB4.SA': 'ITUB4',
-      'BBDC4.SA': 'BBDC4',
-      'ABEV3.SA': 'ABEV3'
-    };
-    return nameMap[symbol] || name.substring(0, 10);
-  };
+  const renderTickerItem = (item: TickerItem, key: string) => (
+    <div key={key} className="ticker-item">
+      <div className="flex items-center space-x-3">
+        <span className="font-semibold text-gray-900 dark:text-white text-sm">
+          {item.symbol}
+        </span>
+        <span className="font-medium text-gray-700 dark:text-gray-300 text-sm">
+          {formatPrice(item.price, item.symbol)}
+        </span>
+        <span className={`flex items-center text-sm font-medium ${
+          item.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+        }`}>
+          {item.changePercent >= 0 ? (
+            <TrendingUp className="h-3 w-3 mr-1" />
+          ) : (
+            <TrendingDown className="h-3 w-3 mr-1" />
+          )}
+          {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
+        </span>
+      </div>
+    </div>
+  );
 
-  // Renderização instantânea: mostra ticker mesmo durante carregamento, se houver dados
-  const hasData = tickerData.length > 0;
-  // Duração da animação proporcional ao número de ativos (mínimo 18s)
-  const animationDuration = Math.max(18, tickerData.length * 2.5);
-
-  return (
-    <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${className}`}>
-      {!hasData ? (
-        isLoading ? (
-          <div className="flex items-center justify-center py-3 sm:py-4">
-            <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-primary-600"></div>
-            <span className="ml-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">Carregando dados do mercado...</span>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center py-3 sm:py-4">
-            <div className="text-sm text-gray-500 dark:text-gray-400">📊 Dados de mercado indisponíveis no momento</div>
-          </div>
+  // Criar múltiplas cópias para scroll infinito perfeito usando dados dinâmicos
+  const infiniteContent = useMemo(() => {
+    if (!tickerData || tickerData.length === 0) return [];
+    
+    const copies = [];
+    // Criar 4 cópias completas de todos os dados para scroll suave
+    for (let i = 0; i < 4; i++) {
+      copies.push(
+        ...tickerData.map((item, index) => 
+          renderTickerItem(item, `${item.symbol}-copy-${i}-${index}`)
         )
-      ) : (
-        <div className="ticker-container">
-          <div className="ticker-content" style={{ animationDuration: `${animationDuration}s` }}>
-            {[...tickerData, ...tickerData].map((item, index) => (
-              <div key={`${item.symbol}-${index}`} className="ticker-item">
-                <div className="flex items-center space-x-1 sm:space-x-2">
-                  <span className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm truncate max-w-20 sm:max-w-none">{getDisplayName(item.name, item.symbol)}</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">({item.symbol})</span>
-                  <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
-                    {formatPrice(item.price, item.symbol)}
-                  </span>
-                  <span className={`flex items-center text-xs sm:text-sm ${
-                    item.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {item.changePercent >= 0 ? (
-                      <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
-                    ) : (
-                      <TrendingDown className="h-2 w-2 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
-                    )}
-                    {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
-                  </span>
-                </div>
-              </div>
-            ))}
+      );
+    }
+    return copies;
+  }, [tickerData]);
+
+  if (loading) {
+    return (
+      <div className={`relative overflow-hidden bg-white dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 ${className}`}>
+        <div className="flex items-center justify-center py-4">
+          <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span className="text-sm">Carregando dados do mercado...</span>
           </div>
         </div>
-      )}
-      <style>{`
-        .ticker-container {
-          overflow: hidden;
-          white-space: nowrap;
-          position: relative;
-          height: 40px;
-          display: flex;
-          align-items: center;
-        }
-        @media (min-width: 640px) {
+      </div>
+    );
+  }
+
+  return (
+    <div className={`relative overflow-hidden bg-white dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 ${className}`}>
+      <div className="ticker-container">
+        {infiniteContent}
+      </div>
+      
+      <style>
+        {`
           .ticker-container {
-            height: 60px;
+            display: flex;
+            animation: scroll-infinite 25s linear infinite;
+            backface-visibility: hidden;
+            perspective: 1000px;
+            will-change: transform;
+            transform: translateZ(0);
           }
-        }
-        .ticker-content {
-          display: flex;
-          animation: ticker-scroll linear infinite;
-          will-change: transform;
-        }
-        .ticker-content:hover {
-          animation-play-state: paused;
-        }
-        .ticker-item {
-          flex-shrink: 0;
-          padding: 0 0.75rem;
-          display: flex;
-          align-items: center;
-          height: 40px;
-        }
-        @media (min-width: 640px) {
+          
           .ticker-item {
-            padding: 0 2rem;
-            height: 60px;
+            flex-shrink: 0;
+            padding: 12px 24px;
+            white-space: nowrap;
+            transition: none;
+            transform: translateZ(0);
           }
-        }
-        @keyframes ticker-scroll {
-          0% {
-            transform: translateX(0);
+          
+          @keyframes scroll-infinite {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-25%); }
           }
-          100% {
-            transform: translateX(-50%);
+          
+          @media (prefers-reduced-motion: reduce) {
+            .ticker-container {
+              animation: scroll-infinite 25s linear infinite !important;
+            }
           }
-        }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
